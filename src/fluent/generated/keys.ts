@@ -12,6 +12,7 @@ declare global {
                     'components/AnalysisPage.css': {
                         table: 'sys_ux_theme_asset'
                         id: 'e15337ea4b204e3f898ef54135d0afb4'
+                        deleted: true
                     }
                     direct_analysis_module: {
                         table: 'sys_app_module'
