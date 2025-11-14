@@ -63,162 +63,164 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
 
   return (
     <div className="analysis-page">
-      {/* Header Card - Incident Metadata */}
-      <div className="header-card">
-        <div className="incident-header-content">
-          <div className="incident-primary-info">
-            <h1 className="incident-number" data-text={incident?.number}>{incident?.number}</h1>
-            <p className="incident-description">{incident?.short_description}</p>
-          </div>
-          
-          <div className="incident-status-grid">
-            <div className="status-item">
-              <span className="status-label">State</span>
-              <span className={`status-badge state-${incident?.state?.toLowerCase()?.replace(/\s+/g, '-')}`}>
-                {incident?.state}
-              </span>
-            </div>
-            <div className="status-item">
-              <span className="status-label">Priority</span>
-              <span className={`status-badge priority-${incident?.priority?.toLowerCase()}`}>
-                {incident?.priority}
-              </span>
-            </div>
-            <div className="status-item">
-              <span className="status-label">Category</span>
-              <span className="status-value">{incident?.category || 'N/A'}</span>
-            </div>
-            <div className="status-item">
-              <span className="status-label">Assigned To</span>
-              <span className="status-value">{incident?.assigned_to || 'Unassigned'}</span>
-            </div>
-            <div className="status-item">
-              <span className="status-label">Assignment Group</span>
-              <span className="status-value">{incident?.assignment_group || 'N/A'}</span>
-            </div>
-            <div className="status-item">
-              <span className="status-label">Opened</span>
-              <span className="status-value">{incident?.opened_at ? new Date(incident.opened_at).toLocaleDateString() : 'N/A'}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="content-grid">
-        {/* Timeline Component */}
-        <div className="timeline-section">
-          <div className="timeline-card">
-            <div className="card-header">
-              <h2 className="card-title">
-                <span className="card-icon">📅</span>
-                Incident Timeline
-              </h2>
-              <span className="timeline-count">{timeline.length} events</span>
+      <div className="analysis-card">
+        {/* Header Section - Incident Metadata */}
+        <div className="header-card">
+          <div className="incident-header-content">
+            <div className="incident-primary-info">
+              <h1 className="incident-number" data-text={incident?.number}>{incident?.number}</h1>
+              <p className="incident-description">{incident?.short_description}</p>
             </div>
             
-            <div className="timeline-container">
-              {timeline.map((event, index) => (
-                <TimelineEvent key={index} event={event} isLast={index === timeline.length - 1} />
-              ))}
+            <div className="incident-status-grid">
+              <div className="status-item">
+                <span className="status-label">State</span>
+                <span className={`status-badge state-${incident?.state?.toLowerCase()?.replace(/\s+/g, '-')}`}>
+                  {incident?.state}
+                </span>
+              </div>
+              <div className="status-item">
+                <span className="status-label">Priority</span>
+                <span className={`status-badge priority-${incident?.priority?.toLowerCase()}`}>
+                  {incident?.priority}
+                </span>
+              </div>
+              <div className="status-item">
+                <span className="status-label">Category</span>
+                <span className="status-value">{incident?.category || 'N/A'}</span>
+              </div>
+              <div className="status-item">
+                <span className="status-label">Assigned To</span>
+                <span className="status-value">{incident?.assigned_to || 'Unassigned'}</span>
+              </div>
+              <div className="status-item">
+                <span className="status-label">Assignment Group</span>
+                <span className="status-value">{incident?.assignment_group || 'N/A'}</span>
+              </div>
+              <div className="status-item">
+                <span className="status-label">Opened</span>
+                <span className="status-value">{incident?.opened_at ? new Date(incident.opened_at).toLocaleDateString() : 'N/A'}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Debrief Cards */}
-        <div className="debrief-section">
-          {/* Overview Card */}
-          <div className="debrief-card">
-            <div className="card-header">
-              <h2 className="card-title">
-                <span className="card-icon">📋</span>
-                Overview
-              </h2>
-            </div>
-            <div className="card-content">
-              <div className="overview-grid">
-                <div className="overview-item">
-                  <span className="overview-label">Root Cause</span>
-                  <p className="overview-value">{analysisData?.rootCause || 'Analysis pending'}</p>
-                </div>
-                <div className="overview-item">
-                  <span className="overview-label">Impact Assessment</span>
-                  <p className="overview-value">{analysisData?.impact || 'Assessment pending'}</p>
-                </div>
+        {/* Main Content Sections */}
+        <div className="content-grid">
+          {/* Timeline Section */}
+          <div className="timeline-section">
+            <div className="timeline-card">
+              <div className="card-header">
+                <h2 className="card-title">
+                  <span className="card-icon">📅</span>
+                  Incident Timeline
+                </h2>
+                <span className="timeline-count">{timeline.length} events</span>
+              </div>
+              
+              <div className="timeline-container">
+                {timeline.map((event, index) => (
+                  <TimelineEvent key={index} event={event} isLast={index === timeline.length - 1} />
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Actions Taken Card */}
-          <div className="debrief-card">
-            <div className="card-header">
-              <h2 className="card-title">
-                <span className="card-icon">🔧</span>
-                Actions Taken
-              </h2>
-            </div>
-            <div className="card-content">
-              <div className="actions-grid">
-                <div className="action-section">
-                  <h4 className="section-title">Recommendations</h4>
-                  <ul className="action-list">
-                    {analysisData?.recommendations?.map((rec, index) => (
-                      <li key={index} className="action-item">{rec}</li>
-                    )) || <li className="no-data">No recommendations available</li>}
-                  </ul>
-                </div>
-                <div className="action-section">
-                  <h4 className="section-title">Prevention Measures</h4>
-                  <ul className="action-list">
-                    {analysisData?.preventionMeasures?.map((measure, index) => (
-                      <li key={index} className="action-item">{measure}</li>
-                    )) || <li className="no-data">No prevention measures identified</li>}
-                  </ul>
+          {/* Debrief Section */}
+          <div className="debrief-section">
+            {/* Overview */}
+            <div className="debrief-card">
+              <div className="card-header">
+                <h2 className="card-title">
+                  <span className="card-icon">📋</span>
+                  Overview
+                </h2>
+              </div>
+              <div className="card-content">
+                <div className="overview-grid">
+                  <div className="overview-item">
+                    <span className="overview-label">Root Cause</span>
+                    <p className="overview-value">{analysisData?.rootCause || 'Analysis pending'}</p>
+                  </div>
+                  <div className="overview-item">
+                    <span className="overview-label">Impact Assessment</span>
+                    <p className="overview-value">{analysisData?.impact || 'Assessment pending'}</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Metrics Card */}
-          <div className="debrief-card">
-            <div className="card-header">
-              <h2 className="card-title">
-                <span className="card-icon">📊</span>
-                Metrics
-              </h2>
+            {/* Actions Taken */}
+            <div className="debrief-card">
+              <div className="card-header">
+                <h2 className="card-title">
+                  <span className="card-icon">🔧</span>
+                  Actions Taken
+                </h2>
+              </div>
+              <div className="card-content">
+                <div className="actions-grid">
+                  <div className="action-section">
+                    <h4 className="section-title">Recommendations</h4>
+                    <ul className="action-list">
+                      {analysisData?.recommendations?.map((rec, index) => (
+                        <li key={index} className="action-item">{rec}</li>
+                      )) || <li className="no-data">No recommendations available</li>}
+                    </ul>
+                  </div>
+                  <div className="action-section">
+                    <h4 className="section-title">Prevention Measures</h4>
+                    <ul className="action-list">
+                      {analysisData?.preventionMeasures?.map((measure, index) => (
+                        <li key={index} className="action-item">{measure}</li>
+                      )) || <li className="no-data">No prevention measures identified</li>}
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="card-content">
-              <div className="metrics-grid">
-                <MetricItem 
-                  icon="⏱️"
-                  label="Resolution Time"
-                  value={debrief?.resolution_time?.display || 'N/A'}
-                  status={debrief?.resolution_time?.is_resolved ? 'resolved' : 'active'}
-                />
-                <MetricItem 
-                  icon="🔄"
-                  label="Assignment Changes"
-                  value={debrief?.handoff_count || 0}
-                  subtitle={`${debrief?.groups_involved?.length || 0} groups involved`}
-                />
-                <MetricItem 
-                  icon="💬"
-                  label="Communication"
-                  value={debrief?.note_count?.total || 0}
-                  subtitle={`${debrief?.note_count?.comments || 0} comments, ${debrief?.note_count?.work_notes || 0} notes`}
-                />
-                <MetricItem 
-                  icon="📈"
-                  label="State Changes"
-                  value={debrief?.state_changes || 0}
-                  subtitle={`${debrief?.priority_changes || 0} priority changes`}
-                />
-                <MetricItem 
-                  icon="⚡"
-                  label="First Response"
-                  value={debrief?.first_response_time?.display || 'No response'}
-                  subtitle={debrief?.first_response_time?.response_by || ''}
-                />
+
+            {/* Metrics */}
+            <div className="debrief-card">
+              <div className="card-header">
+                <h2 className="card-title">
+                  <span className="card-icon">📊</span>
+                  Metrics
+                </h2>
+              </div>
+              <div className="card-content">
+                <div className="metrics-grid">
+                  <MetricItem 
+                    icon="⏱️"
+                    label="Resolution Time"
+                    value={debrief?.resolution_time?.display || 'N/A'}
+                    status={debrief?.resolution_time?.is_resolved ? 'resolved' : 'active'}
+                  />
+                  <MetricItem 
+                    icon="🔄"
+                    label="Assignment Changes"
+                    value={debrief?.handoff_count || 0}
+                    subtitle={`${debrief?.groups_involved?.length || 0} groups involved`}
+                  />
+                  <MetricItem 
+                    icon="💬"
+                    label="Communication"
+                    value={debrief?.note_count?.total || 0}
+                    subtitle={`${debrief?.note_count?.comments || 0} comments, ${debrief?.note_count?.work_notes || 0} notes`}
+                  />
+                  <MetricItem 
+                    icon="📈"
+                    label="State Changes"
+                    value={debrief?.state_changes || 0}
+                    subtitle={`${debrief?.priority_changes || 0} priority changes`}
+                  />
+                  <MetricItem 
+                    icon="⚡"
+                    label="First Response"
+                    value={debrief?.first_response_time?.display || 'No response'}
+                    subtitle={debrief?.first_response_time?.response_by || ''}
+                  />
+                </div>
               </div>
             </div>
           </div>
