@@ -1,7 +1,9 @@
-/* Analysis Page - Clean Modern Design */
+/* Analysis Page - Light, modern, professional design aligned with LandingPage */
+
+/* Force a light surface for the whole analysis experience */
 .analysis-page {
   min-height: 100vh;
-  background: #ffffff;
+  background: #ffffff !important; /* ensure no dark theme bleeds through */
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -16,7 +18,7 @@
   align-items: center;
   justify-content: center;
   min-height: 60vh;
-  background: #ffffff;
+  background: #ffffff !important;
   border-radius: 16px;
   padding: 4rem 3rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
@@ -67,7 +69,7 @@
 
 /* Header Card */
 .header-card {
-  background: #ffffff;
+  background: #ffffff !important; /* override old blue gradient */
   border-radius: 16px;
   padding: 3rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
@@ -199,14 +201,10 @@
   gap: 2.5rem;
 }
 
-/* Timeline Section */
-.timeline-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.timeline-card {
-  background: rgba(255, 255, 255, 0.98);
+/* Card shared styles */
+.timeline-card,
+.debrief-card {
+  background: #ffffff !important; /* override any dark card styles */
   border-radius: 16px;
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.08),
@@ -235,9 +233,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
+  background: #f9fafb !important;
 }
 
 .card-header:hover {
@@ -367,7 +363,7 @@
 
 .timeline-content {
   flex: 1;
-  background: rgba(255, 255, 255, 0.7);
+  background: #f8fafc !important;
   border-radius: 12px;
   padding: 1.5rem 1.75rem;
   border: 1px solid rgba(0, 115, 230, 0.08);
@@ -460,8 +456,8 @@
 }
 
 .note-content {
-  background: rgba(255, 255, 255, 0.8);
-  padding: 1rem;
+  background: #ffffff !important;
+  padding: 0.9rem 1rem;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 0.95rem;
@@ -546,13 +542,10 @@
   color: #4a5568;
   line-height: 1.7;
   margin: 0;
-  background: rgba(255, 255, 255, 0.7);
-  padding: 1.25rem 1.5rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+  background: #f8fafc !important;
+  padding: 1.1rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
 }
 
 .overview-value:hover {
@@ -606,11 +599,11 @@
 }
 
 .action-item {
-  background: rgba(255, 255, 255, 0.7);
-  padding: 1rem 1.25rem;
-  border-radius: 12px;
-  border-left: 4px solid #0073e6;
-  font-size: 0.95rem;
+  background: #f8fafc !important;
+  padding: 0.9rem 1.1rem;
+  border-radius: 10px;
+  border-left: 3px solid #0073e6;
+  font-size: 0.9rem;
   line-height: 1.6;
   color: #4a5568;
   transition: all 0.3s ease;
@@ -640,8 +633,8 @@
 }
 
 .no-data {
-  background: rgba(255, 255, 255, 0.7);
-  padding: 1.25rem 1.5rem;
+  background: #f8fafc !important;
+  padding: 1rem 1.25rem;
   text-align: center;
   color: #a0aec0;
   font-style: italic;
@@ -663,8 +656,8 @@
 }
 
 .metric-item {
-  background: rgba(255, 255, 255, 0.7);
-  padding: 1.5rem;
+  background: #f8fafc !important;
+  padding: 1.4rem 1.5rem;
   border-radius: 12px;
   border: 1px solid rgba(0, 115, 230, 0.08);
   text-align: center;
