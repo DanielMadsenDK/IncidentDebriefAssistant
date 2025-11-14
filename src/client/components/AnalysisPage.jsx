@@ -67,7 +67,7 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
       <div className="header-card">
         <div className="incident-header-content">
           <div className="incident-primary-info">
-            <h1 className="incident-number">{incident?.number}</h1>
+            <h1 className="incident-number" data-text={incident?.number}>{incident?.number}</h1>
             <p className="incident-description">{incident?.short_description}</p>
           </div>
           

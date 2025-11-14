@@ -130,7 +130,7 @@ export default function LandingPage({ onNavigateToAnalysis }) {
     return (
       <div className="landing-page">
         <div className="hero-section">
-          <h1 className="hero-title">Incident Debrief Assistant</h1>
+          <h1 className="hero-title" data-text="Incident Debrief Assistant">Incident Debrief Assistant</h1>
           <p className="hero-subtitle">
             Comprehensive incident analysis and debrief tool powered by deterministic data processing
           </p>
