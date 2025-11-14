@@ -13,6 +13,13 @@ export default function LandingPage({ onNavigateToAnalysis }) {
 
   // Search for incidents when search term changes
   useEffect(() => {
+    // If the input still reflects the currently selected incident, don't re-search
+    if (selectedIncident && searchTerm.startsWith(selectedIncident.number)) {
+      setShowDropdown(false);
+      setSearchResults([]);
+      return;
+    }
+
     if (searchTerm.length > 2) {
       setIsSearching(true);
       setError(null);
@@ -20,22 +27,25 @@ export default function LandingPage({ onNavigateToAnalysis }) {
       searchService.searchIncidents(searchTerm)
         .then(results => {
           console.log('Search results:', results); // Debug log
-          setSearchResults(results || []);
-          setShowDropdown(true);
+          const safeResults = results || [];
+          setSearchResults(safeResults);
           setIsSearching(false);
+          // Only show dropdown when there are results to choose from
+          setShowDropdown(safeResults.length > 0);
         })
         .catch(error => {
           console.error('Search error:', error);
           setError('Search failed: ' + error.message);
           setIsSearching(false);
           setSearchResults([]);
+          setShowDropdown(false);
         });
     } else {
       setSearchResults([]);
       setShowDropdown(false);
       setError(null);
     }
-  }, [searchTerm, searchService]);
+  }, [searchTerm, searchService, selectedIncident]);
 
   const handleAnalyze = () => {
     if (selectedIncident) {
@@ -53,6 +63,8 @@ export default function LandingPage({ onNavigateToAnalysis }) {
     try {
       setSelectedIncident(incident);
       setSearchTerm(incident.number + ' - ' + incident.short_description);
+      // Clear results and hide panel so the button remains visible
+      setSearchResults([]);
       setShowDropdown(false);
       setError(null);
     } catch (error) {
@@ -234,7 +246,7 @@ export default function LandingPage({ onNavigateToAnalysis }) {
                 </div>
               )}
 
-              {showDropdown && searchResults && searchResults.length === 0 && !isSearching && searchTerm.length > 2 && (
+              {showDropdown && searchResults && searchResults.length === 0 && !isSearching && searchTerm.length > 2 && !selectedIncident && (
                 <div className="search-dropdown">
                   <div className="no-results">
                     <span className="no-results-icon">🔍</span>

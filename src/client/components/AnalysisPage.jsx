@@ -107,7 +107,51 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
 
         {/* Main Content Sections */}
         <div className="content-grid">
-          {/* Timeline Section */}
+          {/* Metrics Section - immediately under header */}
+          <div className="debrief-card">
+            <div className="card-header">
+              <h2 className="card-title">
+                <span className="card-icon">📊</span>
+                Metrics
+              </h2>
+            </div>
+            <div className="card-content">
+              <div className="metrics-grid">
+                <MetricItem 
+                  icon="⏱️"
+                  label="Resolution Time"
+                  value={debrief?.resolution_time?.display || 'N/A'}
+                  status={debrief?.resolution_time?.is_resolved ? 'resolved' : 'active'}
+                />
+                <MetricItem 
+                  icon="🔄"
+                  label="Assignment Changes"
+                  value={debrief?.handoff_count || 0}
+                  subtitle={`${debrief?.groups_involved?.length || 0} groups involved`}
+                />
+                <MetricItem 
+                  icon="💬"
+                  label="Communication"
+                  value={debrief?.note_count?.total || 0}
+                  subtitle={`${debrief?.note_count?.comments || 0} comments, ${debrief?.note_count?.work_notes || 0} notes`}
+                />
+                <MetricItem 
+                  icon="📈"
+                  label="State Changes"
+                  value={debrief?.state_changes || 0}
+                  subtitle={`${debrief?.priority_changes || 0} priority changes`}
+                />
+                <MetricItem 
+                  icon="⚡"
+                  label="First Response"
+                  value={debrief?.first_response_time?.display || 'No response'}
+                  subtitle={debrief?.first_response_time?.response_by || ''}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Timeline Section (horizontal) */}
           <div className="timeline-section">
             <div className="timeline-card">
               <div className="card-header">
@@ -126,7 +170,7 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
             </div>
           </div>
 
-          {/* Debrief Section */}
+          {/* Debrief Section (Overview & Actions) */}
           <div className="debrief-section">
             {/* Overview */}
             <div className="debrief-card">
@@ -176,50 +220,6 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
                       )) || <li className="no-data">No prevention measures identified</li>}
                     </ul>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Metrics */}
-            <div className="debrief-card">
-              <div className="card-header">
-                <h2 className="card-title">
-                  <span className="card-icon">📊</span>
-                  Metrics
-                </h2>
-              </div>
-              <div className="card-content">
-                <div className="metrics-grid">
-                  <MetricItem 
-                    icon="⏱️"
-                    label="Resolution Time"
-                    value={debrief?.resolution_time?.display || 'N/A'}
-                    status={debrief?.resolution_time?.is_resolved ? 'resolved' : 'active'}
-                  />
-                  <MetricItem 
-                    icon="🔄"
-                    label="Assignment Changes"
-                    value={debrief?.handoff_count || 0}
-                    subtitle={`${debrief?.groups_involved?.length || 0} groups involved`}
-                  />
-                  <MetricItem 
-                    icon="💬"
-                    label="Communication"
-                    value={debrief?.note_count?.total || 0}
-                    subtitle={`${debrief?.note_count?.comments || 0} comments, ${debrief?.note_count?.work_notes || 0} notes`}
-                  />
-                  <MetricItem 
-                    icon="📈"
-                    label="State Changes"
-                    value={debrief?.state_changes || 0}
-                    subtitle={`${debrief?.priority_changes || 0} priority changes`}
-                  />
-                  <MetricItem 
-                    icon="⚡"
-                    label="First Response"
-                    value={debrief?.first_response_time?.display || 'No response'}
-                    subtitle={debrief?.first_response_time?.response_by || ''}
-                  />
                 </div>
               </div>
             </div>
