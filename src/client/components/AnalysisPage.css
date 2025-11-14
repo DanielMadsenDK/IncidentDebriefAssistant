@@ -1,8 +1,9 @@
 /* Analysis Page - Light, modern, professional design aligned with LandingPage */
 
+/* Force a light surface for the whole analysis experience */
 .analysis-page {
   min-height: 100vh;
-  background: #ffffff;
+  background: #ffffff !important; /* ensure no dark theme bleeds through */
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -20,7 +21,7 @@
   align-items: center;
   justify-content: center;
   min-height: 60vh;
-  background: #ffffff;
+  background: #ffffff !important;
   border-radius: 16px;
   padding: 3rem 2.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
@@ -80,7 +81,7 @@
 
 /* Header Card - Incident Metadata */
 .header-card {
-  background: #ffffff;
+  background: #ffffff !important; /* override old blue gradient */
   border-radius: 16px;
   padding: 2.5rem 2.75rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
@@ -223,7 +224,7 @@
 /* Card shared styles */
 .timeline-card,
 .debrief-card {
-  background: #ffffff;
+  background: #ffffff !important; /* override any dark card styles */
   border-radius: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
   border: 1px solid #e2e8f0;
@@ -236,7 +237,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f9fafb;
+  background: #f9fafb !important;
 }
 
 .card-title {
@@ -330,7 +331,7 @@
 
 .timeline-content {
   flex: 1;
-  background: #f8fafc;
+  background: #f8fafc !important;
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
   border: 1px solid #e2e8f0;
@@ -376,7 +377,7 @@
 }
 
 .note-content {
-  background: #ffffff;
+  background: #ffffff !important;
   padding: 0.9rem 1rem;
   border-radius: 10px;
   border: 1px solid #e2e8f0;
@@ -417,7 +418,7 @@
   color: #4a5568;
   line-height: 1.7;
   margin: 0;
-  background: #f8fafc;
+  background: #f8fafc !important;
   padding: 1.1rem 1.25rem;
   border-radius: 10px;
   border: 1px solid #e2e8f0;
@@ -456,7 +457,7 @@
 }
 
 .action-item {
-  background: #f8fafc;
+  background: #f8fafc !important;
   padding: 0.9rem 1.1rem;
   border-radius: 10px;
   border-left: 3px solid #0073e6;
@@ -466,7 +467,7 @@
 }
 
 .no-data {
-  background: #f8fafc;
+  background: #f8fafc !important;
   padding: 1rem 1.25rem;
   text-align: center;
   color: #a0aec0;
@@ -482,7 +483,7 @@
 }
 
 .metric-item {
-  background: #f8fafc;
+  background: #f8fafc !important;
   padding: 1.4rem 1.5rem;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
