@@ -2,7 +2,7 @@
 
 .analysis-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #f5f7ff 0%, #ffffff 55%, #ffffff 100%);
+  background: #ffffff;
   padding: 2rem;
   display: flex;
   flex-direction: column;
