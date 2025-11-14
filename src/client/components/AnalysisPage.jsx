@@ -111,7 +111,6 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
           <div className="debrief-card">
             <div className="card-header">
               <h2 className="card-title">
-                <span className="card-icon">📊</span>
                 Metrics
               </h2>
             </div>
@@ -156,7 +155,6 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
             <div className="timeline-card">
               <div className="card-header">
                 <h2 className="card-title">
-                  <span className="card-icon">📅</span>
                   Incident Timeline
                 </h2>
                 <span className="timeline-count">{timeline.length} events</span>
@@ -176,7 +174,6 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
             <div className="debrief-card">
               <div className="card-header">
                 <h2 className="card-title">
-                  <span className="card-icon">📋</span>
                   Overview
                 </h2>
               </div>
@@ -198,7 +195,6 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
             <div className="debrief-card">
               <div className="card-header">
                 <h2 className="card-title">
-                  <span className="card-icon">🔧</span>
                   Actions Taken
                 </h2>
               </div>
