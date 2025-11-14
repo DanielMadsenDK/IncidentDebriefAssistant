@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_module">
+    <sys_module action="INSERT_OR_UPDATE">
+        <content><![CDATA[{
+  "name": "x-1118332-incident-deb",
+  "version": "1.0.0",
+  "description": "[BUILD AGENT GENERATED]:  An application for incident analysis and debrief using server-side processing and API calls without database storage",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "now-sdk build",
+    "deploy": "now-sdk install",
+    "transform": "now-sdk transform",
+    "types": "now-sdk dependencies"
+  },
+  "devDependencies": {
+    "@servicenow/sdk": "4.0.2",
+    "@servicenow/glide": "26.0.1",
+    "eslint": "8.50.0",
+    "@servicenow/eslint-plugin-sdk-app-plugin": "4.0.2"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  }
+}]]></content>
+        <external_source>false</external_source>
+        <path>x_1118332_incident/x-1118332-incident-deb/1.0.0/package.json</path>
+        <sys_class_name>sys_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-14 14:22:49</sys_created_on>
+        <sys_id>c4581e17cf0b4648ad953c1453513cb5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_1118332_incident/x-1118332-incident-deb/1.0.0/package.json</sys_name>
+        <sys_package display_value="Incident Deb" source="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Incident Deb">41d6f38453913210030191e0a0490ea0</sys_scope>
+        <sys_update_name>sys_module_c4581e17cf0b4648ad953c1453513cb5</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-14 14:22:49</sys_updated_on>
+    </sys_module>
+</record_update>
