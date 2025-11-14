@@ -15,6 +15,11 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
     }
   }, [incidentSysId]);
 
+  // Scroll to top when analysis page loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const loadAnalysis = async () => {
     setIsLoading(true);
     setError(null);
