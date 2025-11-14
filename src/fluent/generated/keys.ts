@@ -9,6 +9,10 @@ declare global {
                         table: 'sys_module'
                         id: '567c48dfdc3345569c76aeababb688ee'
                     }
+                    'components/AnalysisPage.css': {
+                        table: 'sys_ux_theme_asset'
+                        id: 'b99138f48b2e470d8dfdbcef981af7eb'
+                    }
                     direct_analysis_module: {
                         table: 'sys_app_module'
                         id: '914f0173b7c74c2f908abc4b56bb9755'
