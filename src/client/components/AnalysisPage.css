@@ -217,8 +217,9 @@
 /* Main Content Grid */
 .content-grid {
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 2.5rem;
+  grid-template-columns: 1.2fr 1fr; /* slightly wider timeline column for better balance */
+  gap: 2rem; /* tighten column gap to use space more efficiently */
+  align-items: flex-start;
 }
 
 /* Card shared styles */
@@ -264,7 +265,7 @@
 }
 
 .card-content {
-  padding: 2rem;
+  padding: 1.75rem 1.75rem 1.9rem; /* slightly tighter, more modern card padding */
 }
 
 /* Timeline Section */
@@ -276,7 +277,8 @@
 .timeline-container {
   max-height: 70vh;
   overflow-y: auto;
-  padding-right: 0.5rem;
+  /* Add comfortable breathing room around timeline events */
+  padding: 1.75rem 2rem 2rem 2.25rem; /* top, right, bottom, left */
 }
 
 .timeline-container::-webkit-scrollbar {
@@ -387,9 +389,24 @@
 
 /* Debrief Section */
 .debrief-section {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 1.75rem;
+}
+
+/* Make Metrics card span full width on desktop for a dashboard feel */
+.debrief-section .debrief-card:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  .debrief-section {
+    grid-template-columns: 1fr;
+  }
+
+  .debrief-section .debrief-card:nth-child(3) {
+    grid-column: auto;
+  }
 }
 
 /* Overview */
