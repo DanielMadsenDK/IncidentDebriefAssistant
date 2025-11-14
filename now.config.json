@@ -1,0 +1,6 @@
+{
+  "scope": "x_1118332_incident",
+  "scopeId": "41d6f38453913210030191e0a0490ea0",
+  "name": "Incident Deb",
+  "tsconfigPath": "./src/server/tsconfig.json"
+}
