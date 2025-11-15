@@ -975,10 +975,10 @@
     word-wrap: break-word;
   }
   
-  /* Add 25px margin between headline and metrics grid */
-  .ci-health-grid {
-    margin-top: 25px;
-  }
+/* Add 25px margin between headline and metrics grid */
+.ci-health-grid {
+  margin-top: 0px;
+}
   
   /* Config display container - styled row for the content */
   .config-display {
@@ -1045,13 +1045,13 @@
     border-radius: 10px;
   }
   
-  /* Metrics Row */
-  .metrics-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-    margin-top: 25px;
-  }
+/* Metrics Row */
+.metrics-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 0px;
+}
   
   .metric-item {
     background: #f8fafc !important;
@@ -2307,4 +2307,3 @@
       padding: 1rem;
     }
   }
-  
