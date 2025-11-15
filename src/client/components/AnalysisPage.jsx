@@ -239,8 +239,6 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
 // Horizontal Timeline Component
 function HorizontalTimeline({ timelineData }) {
   const [expandedId, setExpandedId] = useState(null);
-  const [containerWidth, setContainerWidth] = useState(0);
-  const timelineRef = useRef(null);
 
   // Helper function to get icons
   const getEventIcon = (event) => {
@@ -259,39 +257,32 @@ function HorizontalTimeline({ timelineData }) {
     }
   };
 
-  useEffect(() => {
-    const updateWidth = () => {
-      if (timelineRef.current) {
-        setContainerWidth(timelineRef.current.offsetWidth);
-      }
-    };
-
-    updateWidth();
-    window.addEventListener('resize', updateWidth);
-    return () => window.removeEventListener('resize', updateWidth);
-  }, []);
+  // Sort timeline data chronologically
+  const sortedTimelineData = [...timelineData].sort((a, b) => {
+    return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+  });
 
   // Transform timeline data into timeline items
-  const timelineItems = timelineData.map((event, index) => {
+  const timelineItems = sortedTimelineData.map((event, index) => {
     const type = event.type;
-    let title, company, duration, description, achievements, icon;
+    let title, subtitle, duration, description, achievements, icon;
 
     if (type === 'field_change') {
       title = event.change_description;
-      company = event.user;
+      subtitle = event.user;
       duration = new Date(event.timestamp).toLocaleDateString();
-      description = `${event.field} change`;
+      description = type.replace('_', ' ').toUpperCase();
       achievements = [];
       icon = getEventIcon(event);
     } else {
       // Comment or work note
       title = type === 'comment' ? 'Comment Added' : 'Work Note Added';
-      company = event.user;
+      subtitle = event.user;
       duration = new Date(event.timestamp).toLocaleDateString();
-      description = event.content.length > 100
-        ? event.content.substring(0, 100) + '...'
+      description = event.content.length > 150
+        ? event.content.substring(0, 150) + '...'
         : event.content;
-      achievements = event.content.length > 100 ? [event.content.substring(100)] : [];
+      achievements = event.content.length > 150 ? [event.content.substring(150)] : [];
       icon = type === 'comment' ? '💬' : '📝';
     }
 
@@ -299,7 +290,7 @@ function HorizontalTimeline({ timelineData }) {
       id: index,
       type: type,
       title: title,
-      company: company,
+      subtitle: subtitle,
       duration: duration,
       description: description,
       achievements: achievements,
@@ -307,22 +298,6 @@ function HorizontalTimeline({ timelineData }) {
       timestamp: event.timestamp
     };
   });
-
-  // Calculate positions based on time
-  const getPosition = (timestamp) => {
-    if (timelineData.length <= 1) return 0;
-
-    const times = timelineData.map(event => new Date(event.timestamp).getTime());
-    const minTime = Math.min(...times);
-    const maxTime = Math.max(...times);
-    const currentTime = new Date(timestamp).getTime();
-
-    const containerPadding = 120; // Account for event card widths
-    const availableWidth = Math.max(0, containerWidth - containerPadding);
-
-    if (maxTime === minTime) return 0;
-    return ((currentTime - minTime) / (maxTime - minTime)) * availableWidth;
-  };
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
@@ -333,64 +308,61 @@ function HorizontalTimeline({ timelineData }) {
   }
 
   return (
-    <div className="horizontal-timeline" ref={(el) => { timelineRef.current = el; }}>
-      {/* Main timeline bar */}
-      <div className="horizontal-timeline-bar"></div>
-
-      {/* Timeline events */}
-      <div className="horizontal-timeline-events">
-        {timelineItems.map((item, index) => (
-          <div
-            key={item.id}
-            className="horizontal-timeline-event-item"
-            style={{
-              left: `${getPosition(item.timestamp)}px`,
-              top: index % 2 === 0 ? '-100px' : '20px'
-            }}
-          >
-            {/* Timeline node */}
-            <div className="horizontal-timeline-node">
-              <div className="horizontal-timeline-dot">
-                <span className="horizontal-timeline-icon">{item.icon}</span>
-              </div>
-            </div>
-
-            {/* Content card */}
-            <div className="horizontal-timeline-card">
-              <div
-                className="horizontal-event-card"
-                onClick={() => toggleExpand(item.id)}
-              >
-                <div className="horizontal-event-header">
-                  <span className="horizontal-event-icon">{item.icon}</span>
-                  <h3 className="horizontal-event-title">{item.title}</h3>
+    <div className="horizontal-timeline-container">
+      <div className="horizontal-timeline-wrapper">
+        {/* Timeline scrollable area */}
+        <div className="horizontal-timeline-scroll">
+          <div className="horizontal-timeline-events-container">
+            {timelineItems.map((item) => (
+              <div key={item.id} className="horizontal-timeline-item">
+                {/* Timeline point */}
+                <div className="horizontal-timeline-point">
+                  <div className="horizontal-timeline-dot">
+                    <span className="horizontal-timeline-icon">{item.icon}</span>
+                  </div>
                 </div>
-                <p className="horizontal-event-company">{item.company}</p>
-                <p className="horizontal-event-duration">{item.duration}</p>
-                <p className="horizontal-event-description">{item.description}</p>
 
-                {/* Expandable achievements */}
-                <div
-                  className="horizontal-event-achievements"
-                  style={{
-                    maxHeight: expandedId === item.id ? '500px' : '0',
-                    opacity: expandedId === item.id ? 1 : 0,
-                    transition: 'all 0.3s ease'
-                  }}
-                >
-                  {item.achievements && item.achievements.length > 0 && (
-                    <div className="horizontal-achievements-list">
-                      <h4 className="horizontal-achievements-title">Full Content:</h4>
-                      {item.achievements.map((achievement, i) => (
-                        <p key={i} className="horizontal-achievement-item">{achievement}</p>
-                      ))}
+                {/* Event card */}
+                <div className="horizontal-timeline-card">
+                  <div
+                    className="horizontal-event-card"
+                    onClick={() => toggleExpand(item.id)}
+                  >
+                    <div className="horizontal-event-header">
+                      <span className="horizontal-event-icon">{item.icon}</span>
+                      <h3 className="horizontal-event-title">{item.title}</h3>
                     </div>
-                  )}
+                    <p className="horizontal-event-subtitle">{item.subtitle}</p>
+                    <p className="horizontal-event-duration">{item.duration}</p>
+                    <p className="horizontal-event-description">{item.description}</p>
+
+                    {/* Expandable achievements */}
+                    <div
+                      className="horizontal-event-achievements"
+                      style={{
+                        maxHeight: expandedId === item.id ? '500px' : '0',
+                        opacity: expandedId === item.id ? 1 : 0,
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      {item.achievements && item.achievements.length > 0 && (
+                        <div className="horizontal-achievements-list">
+                          <h4 className="horizontal-achievements-title">Full Content:</h4>
+                          {item.achievements.map((achievement, i) => (
+                            <p key={i} className="horizontal-achievement-item">{achievement}</p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Fixed timeline bar */}
+        <div className="horizontal-timeline-bar-fixed"></div>
       </div>
     </div>
   );
