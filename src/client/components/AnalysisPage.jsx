@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import IncidentAnalysisService from '../services/IncidentAnalysisService.js';
 import './AnalysisPage.css';
 
@@ -172,10 +172,8 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
                 <span className="timeline-count">{timeline.length} events</span>
               </div>
 
-              <div className="timeline-container">
-                {timeline.map((event, index) => (
-                  <TimelineEvent key={index} event={event} isLast={index === timeline.length - 1} />
-                ))}
+              <div className="horizontal-timeline-container">
+                <HorizontalTimeline timelineData={timeline} />
               </div>
             </div>
           </div>
@@ -233,6 +231,166 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Horizontal Timeline Component
+function HorizontalTimeline({ timelineData }) {
+  const [expandedId, setExpandedId] = useState(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const timelineRef = useRef(null);
+
+  // Helper function to get icons
+  const getEventIcon = (event) => {
+    switch (event.type) {
+      case 'field_change':
+        if (event.field === 'state') return '🔄';
+        if (event.field === 'priority') return '⚡';
+        if (event.field === 'assigned_to' || event.field === 'assignment_group') return '👤';
+        return '✏️';
+      case 'comment':
+        return '💬';
+      case 'work_note':
+        return '📝';
+      default:
+        return '📌';
+    }
+  };
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (timelineRef.current) {
+        setContainerWidth(timelineRef.current.offsetWidth);
+      }
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  // Transform timeline data into timeline items
+  const timelineItems = timelineData.map((event, index) => {
+    const type = event.type;
+    let title, company, duration, description, achievements, icon;
+
+    if (type === 'field_change') {
+      title = event.change_description;
+      company = event.user;
+      duration = new Date(event.timestamp).toLocaleDateString();
+      description = `${event.field} change`;
+      achievements = [];
+      icon = getEventIcon(event);
+    } else {
+      // Comment or work note
+      title = type === 'comment' ? 'Comment Added' : 'Work Note Added';
+      company = event.user;
+      duration = new Date(event.timestamp).toLocaleDateString();
+      description = event.content.length > 100
+        ? event.content.substring(0, 100) + '...'
+        : event.content;
+      achievements = event.content.length > 100 ? [event.content.substring(100)] : [];
+      icon = type === 'comment' ? '💬' : '📝';
+    }
+
+    return {
+      id: index,
+      type: type,
+      title: title,
+      company: company,
+      duration: duration,
+      description: description,
+      achievements: achievements,
+      icon: icon,
+      timestamp: event.timestamp
+    };
+  });
+
+  // Calculate positions based on time
+  const getPosition = (timestamp) => {
+    if (timelineData.length <= 1) return 0;
+
+    const times = timelineData.map(event => new Date(event.timestamp).getTime());
+    const minTime = Math.min(...times);
+    const maxTime = Math.max(...times);
+    const currentTime = new Date(timestamp).getTime();
+
+    const containerPadding = 120; // Account for event card widths
+    const availableWidth = Math.max(0, containerWidth - containerPadding);
+
+    if (maxTime === minTime) return 0;
+    return ((currentTime - minTime) / (maxTime - minTime)) * availableWidth;
+  };
+
+  const toggleExpand = (id) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
+
+  if (timelineItems.length === 0) {
+    return <div className="no-timeline-data">No timeline events available</div>;
+  }
+
+  return (
+    <div className="horizontal-timeline" ref={(el) => { timelineRef.current = el; }}>
+      {/* Main timeline bar */}
+      <div className="horizontal-timeline-bar"></div>
+
+      {/* Timeline events */}
+      <div className="horizontal-timeline-events">
+        {timelineItems.map((item, index) => (
+          <div
+            key={item.id}
+            className="horizontal-timeline-event-item"
+            style={{
+              left: `${getPosition(item.timestamp)}px`,
+              top: index % 2 === 0 ? '-100px' : '20px'
+            }}
+          >
+            {/* Timeline node */}
+            <div className="horizontal-timeline-node">
+              <div className="horizontal-timeline-dot">
+                <span className="horizontal-timeline-icon">{item.icon}</span>
+              </div>
+            </div>
+
+            {/* Content card */}
+            <div className="horizontal-timeline-card">
+              <div
+                className="horizontal-event-card"
+                onClick={() => toggleExpand(item.id)}
+              >
+                <div className="horizontal-event-header">
+                  <span className="horizontal-event-icon">{item.icon}</span>
+                  <h3 className="horizontal-event-title">{item.title}</h3>
+                </div>
+                <p className="horizontal-event-company">{item.company}</p>
+                <p className="horizontal-event-duration">{item.duration}</p>
+                <p className="horizontal-event-description">{item.description}</p>
+
+                {/* Expandable achievements */}
+                <div
+                  className="horizontal-event-achievements"
+                  style={{
+                    maxHeight: expandedId === item.id ? '500px' : '0',
+                    opacity: expandedId === item.id ? 1 : 0,
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  {item.achievements && item.achievements.length > 0 && (
+                    <div className="horizontal-achievements-list">
+                      <h4 className="horizontal-achievements-title">Full Content:</h4>
+                      {item.achievements.map((achievement, i) => (
+                        <p key={i} className="horizontal-achievement-item">{achievement}</p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

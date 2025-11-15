@@ -596,6 +596,195 @@
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
+/* Horizontal Timeline Styles */
+.horizontal-timeline-container {
+  position: relative;
+  min-height: 350px;
+  width: 100%;
+  padding: 2rem;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.horizontal-timeline {
+  position: relative;
+  width: 100%;
+  min-width: 800px;
+  height: 300px;
+}
+
+.horizontal-timeline-bar {
+  position: absolute;
+  bottom: 20px;
+  left: 50px;
+  right: 50px;
+  height: 3px;
+  background: linear-gradient(135deg, #0073e6 0%, rgba(0, 115, 230, 0.3) 100%);
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 115, 230, 0.2);
+}
+
+.horizontal-timeline-events {
+  position: relative;
+  height: 100%;
+}
+
+.horizontal-timeline-event-item {
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+  z-index: 1;
+}
+
+.horizontal-timeline-node {
+  position: absolute;
+  top: calc(50% + 50px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+.horizontal-timeline-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0073e6 0%, #00a6ff 100%);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 16px rgba(0, 115, 230, 0.3);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.horizontal-timeline-dot:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 115, 230, 0.4);
+}
+
+.horizontal-timeline-icon {
+  font-size: 1.1rem;
+  color: #ffffff;
+}
+
+.horizontal-timeline-card {
+  position: absolute;
+  top: calc(50% - 80px);
+  left: 50%;
+  transform: translate(-50%, 0);
+  z-index: 2;
+}
+
+.horizontal-event-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  min-width: 280px;
+  max-width: 320px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.horizontal-event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.horizontal-event-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 115, 230, 0.1);
+}
+
+.horizontal-event-icon {
+  font-size: 1.2rem;
+  color: #0073e6;
+}
+
+.horizontal-event-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+  flex: 1;
+}
+
+.horizontal-event-company {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.horizontal-event-duration {
+  font-size: 0.8rem;
+  color: #a0aec0;
+  margin-bottom: 0.75rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  background: rgba(248, 250, 252, 0.8);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.horizontal-event-description {
+  font-size: 0.9rem;
+  color: #4a5568;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.horizontal-event-achievements {
+  overflow: hidden;
+}
+
+.horizontal-achievements-list {
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 115, 230, 0.1);
+}
+
+.horizontal-achievements-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0073e6;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.horizontal-achievement-item {
+  font-size: 0.85rem;
+  color: #374151;
+  line-height: 1.5;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(248, 250, 252, 0.5);
+}
+
+.horizontal-achievement-item:last-child {
+  border-bottom: none;
+}
+
+/* No data state for horizontal timeline */
+.no-timeline-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #a0aec0;
+  font-style: italic;
+  font-size: 0.95rem;
+  background: rgba(248, 250, 252, 0.5);
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.3);
+}
+
 /* Debrief Section */
 .debrief-section {
   display: flex;
