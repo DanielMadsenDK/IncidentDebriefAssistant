@@ -69,11 +69,6 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
 
   return (
     <div className="analysis-page">
-      {/* Premium Back Button */}
-      <button onClick={onNavigateToLanding} className="analysis-back-button">
-        ← Back
-      </button>
-
       {/* Main Analysis Container */}
       <div className="analysis-card">
         {/* Premium Floating Header */}
