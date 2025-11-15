@@ -1,93 +1,95 @@
-export default class IncidentAnalysisService {
-  constructor() {
-    this.scriptInclude = 'x_1118332_incident.IncidentAnalysisUtils';
-  }
+export default function IncidentAnalysisService() {
+  this.scriptInclude = 'x_1118332_incident.IncidentAnalysisUtils';
+}
 
-  async getIncident(sysId) {
-    // This method is not needed since we get incident data from the server-side analysis
-    // But keeping it for compatibility
-    try {
-      const analysis = await this.callScriptInclude('generateIncidentAnalysis', { sys_id: sysId });
-      if (analysis.success) {
-        return analysis.incident;
-      } else {
-        throw new Error(analysis.error || 'Failed to get incident');
-      }
-    } catch (error) {
-      console.error('Get incident error:', error);
-      throw new Error(`Failed to get incident: ${error.message}`);
+IncidentAnalysisService.prototype.getIncident = async function(sysId) {
+  // This method is not needed since we get incident data from the server-side analysis
+  // But keeping it for compatibility
+  try {
+    const analysis = await this.callScriptInclude('generateIncidentAnalysis', { sys_id: sysId });
+    if (analysis.success) {
+      return analysis.incident;
+    } else {
+      throw new Error(analysis.error || 'Failed to get incident');
     }
+  } catch (error) {
+    console.error('Get incident error:', error);
+    throw new Error('Failed to get incident: ' + error.message);
   }
+};
 
-  async analyzeIncident(sysId) {
-    try {
-      console.log('Analyzing incident with sys_id:', sysId);
-      console.log('Using script include:', this.scriptInclude);
-      
-      // Use the server-side Script Include for analysis
-      const analysis = await this.callScriptInclude('generateIncidentAnalysis', { sys_id: sysId });
-      
-      console.log('Analysis result:', analysis);
-      
-      if (!analysis.success) {
-        throw new Error(analysis.error || 'Analysis failed');
-      }
+IncidentAnalysisService.prototype.analyzeIncident = async function(sysId) {
+  try {
+    console.log('Analyzing incident with sys_id:', sysId);
+    console.log('Using script include:', this.scriptInclude);
 
-      return {
-        incident: analysis.incident,
-        timeline: analysis.timeline,
-        debrief: analysis.debrief,
-        // Transform debrief data into the expected format for the UI
-        rootCause: analysis.debrief.cause_summary,
-        impact: this.formatImpactAssessment(analysis.incident, analysis.debrief),
-        recommendations: this.generateRecommendations(analysis.debrief),
-        preventionMeasures: this.generatePreventionMeasures(analysis.debrief)
-      };
-    } catch (error) {
-      console.error('Analyze incident error:', error);
-      throw new Error(`Failed to analyze incident: ${error.message}`);
+    // Use the server-side Script Include for analysis
+    const analysis = await this.callScriptInclude('generateIncidentAnalysis', { sys_id: sysId });
+
+    console.log('Analysis result:', analysis);
+
+    if (!analysis.success) {
+      throw new Error(analysis.error || 'Analysis failed');
     }
+
+    return {
+      incident: analysis.incident,
+      timeline: analysis.timeline,
+      debrief: analysis.debrief,
+      // Transform debrief data into the expected format for the UI
+      rootCause: analysis.debrief.cause_summary,
+      impact: this.formatImpactAssessment(analysis.incident, analysis.debrief),
+      recommendations: this.generateRecommendations(analysis.debrief),
+      preventionMeasures: this.generatePreventionMeasures(analysis.debrief)
+    };
+  } catch (error) {
+    console.error('Analyze incident error:', error);
+    throw new Error('Failed to analyze incident: ' + error.message);
   }
+};
 
-  async callScriptInclude(methodName, parameters = {}) {
-    return new Promise((resolve, reject) => {
-      try {
-        console.log('Creating GlideAjax for method:', methodName);
-        console.log('Parameters:', parameters);
-        
-        const ga = new GlideAjax(this.scriptInclude);
-        ga.addParam('sysparm_name', methodName);
-        
-        // Add all parameters
-        Object.keys(parameters).forEach(key => {
-          ga.addParam('sysparm_' + key, parameters[key]);
-        });
+IncidentAnalysisService.prototype.callScriptInclude = function(methodName, parameters) {
+  if (!parameters) {
+    parameters = {};
+  }
+  return new Promise(function(resolve, reject) {
+    try {
+      console.log('Creating GlideAjax for method:', methodName);
+      console.log('Parameters:', parameters);
 
-        ga.getXMLAnswer((response) => {
-          try {
-            console.log('Raw server response:', response);
-            
-            if (!response) {
-              reject(new Error('Empty response from server'));
-              return;
-            }
+      const ga = new GlideAjax(this.scriptInclude);
+      ga.addParam('sysparm_name', methodName);
 
-            const result = JSON.parse(response);
-            console.log('Parsed analysis result:', result);
-            resolve(result);
-          } catch (parseError) {
-            console.error('Parse error:', parseError, 'Response:', response);
-            reject(new Error('Failed to parse server response: ' + parseError.message));
+      // Add all parameters
+      Object.keys(parameters).forEach(function(key) {
+        ga.addParam('sysparm_' + key, parameters[key]);
+      });
+
+      ga.getXMLAnswer(function(response) {
+        try {
+          console.log('Raw server response:', response);
+
+          if (!response) {
+            reject(new Error('Empty response from server'));
+            return;
           }
-        });
-      } catch (error) {
-        console.error('GlideAjax setup error:', error);
-        reject(new Error('Failed to setup server request: ' + error.message));
-      }
-    });
-  }
 
-  formatImpactAssessment(incident, debrief) {
+          const result = JSON.parse(response);
+          console.log('Parsed analysis result:', result);
+          resolve(result);
+        } catch (parseError) {
+          console.error('Parse error:', parseError, 'Response:', response);
+          reject(new Error('Failed to parse server response: ' + parseError.message));
+        }
+      });
+    } catch (error) {
+      console.error('GlideAjax setup error:', error);
+      reject(new Error('Failed to setup server request: ' + error.message));
+    }
+  }.bind(this));
+};
+
+IncidentAnalysisService.prototype.formatImpactAssessment = function(incident, debrief) {
     const priority = incident.priority || 'Unknown';
     const state = incident.state || 'Unknown';
     const resolutionTime = debrief.resolution_time;
@@ -157,7 +159,7 @@ export default class IncidentAnalysisService {
     return assessment;
   }
 
-  generateRecommendations(debrief) {
+IncidentAnalysisService.prototype.generateRecommendations = function(debrief) {
     const recommendations = [];
     
     // Based on resolution time
@@ -216,7 +218,7 @@ export default class IncidentAnalysisService {
     return recommendations;
   }
 
-  generatePreventionMeasures(debrief) {
+IncidentAnalysisService.prototype.generatePreventionMeasures = function(debrief) {
     const measures = [];
     const causeSummary = debrief.cause_summary.toLowerCase();
 
@@ -256,5 +258,26 @@ export default class IncidentAnalysisService {
     measures.push("Cross-training team members on critical systems");
 
     return measures;
+  },
+
+IncidentAnalysisService.prototype.getCIHealthHistory = function(incidentSysId, preIncidentHours) {
+  if (typeof preIncidentHours === 'undefined') {
+    preIncidentHours = 48;
   }
-}
+  const self = this;
+  return new Promise(function(resolve, reject) {
+    try {
+      const response = self.callScriptInclude('getCIHealthHistoryDuringIncident', {
+        sys_id: incidentSysId,
+        pre_incident_window_hours: preIncidentHours
+      });
+      response.then(resolve).catch(function(error) {
+        console.error('CI health history error:', error);
+        reject(new Error('Failed to get CI health history: ' + error.message));
+      });
+    } catch (error) {
+      console.error('CI health history setup error:', error);
+      reject(new Error('Failed to setup CI health history request: ' + error.message));
+    }
+  });
+};

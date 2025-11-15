@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import IncidentAnalysisService from '../services/IncidentAnalysisService.js';
+import CIHealthHistoryCard from './CIHealthHistoryCard';
 import './AnalysisPage.css';
 
 export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
@@ -265,6 +266,9 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
             {(incident?.hierarchy?.has_parent || incident?.problem_link || incident?.ci_details || incident?.sla_compliance?.length > 0) && (
               <RelatedRecordsCard incident={incident} />
             )}
+
+            {/* CI Health History */}
+            <CIHealthHistoryCard incident={incident} />
 
             {/* Root Cause Analysis */}
             <div className="debrief-card">

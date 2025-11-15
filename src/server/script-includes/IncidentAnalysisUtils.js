@@ -518,6 +518,270 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
     return workload;
   },
 
+  getCIHealthHistoryDuringIncident: function(sys_id, preIncidentWindowHours) {
+    try {
+      // Get incident and validate CI association
+      var incident = new GlideRecord('incident');
+      if (!incident.get(sys_id) || !incident.cmdb_ci) {
+        return {
+          success: false,
+          error: 'Incident not found or no CI associated',
+          data: { ci_present: false, summary: { insights: 'No CI attached to incident - health analysis not available' }}
+        };
+      }
+
+      var healthHistory = {
+        ci_info: {},
+        health_analysis: {},
+        related_activity: {},
+        stress_indicators: {},
+        recommendations: [],
+        correlation_score: 0,
+        analysis_timestamp: new GlideDateTime().getValue()
+      };
+
+      // Get CI information
+      healthHistory.ci_info = this._getCIHealthData(incident.cmdb_ci.toString());
+
+      // Analyze health history during relevant timeframes
+      healthHistory.health_analysis = this._analyzeCIHealthHistory(
+        incident,
+        preIncidentWindowHours || 48
+      );
+
+      // Get related activity (incidents, changes, SLA events)
+      healthHistory.related_activity = this._getCIActivityDuringPeriod(
+        incident.cmdb_ci.toString(),
+        healthHistory.health_analysis.time_window.start_time,
+        healthHistory.health_analysis.time_window.incident_opened_at
+      );
+
+      // Calculate stress indicators and correlation
+      healthHistory = this._calculateCIStressIndicators(healthHistory, incident);
+
+      return {
+        success: true,
+        data: healthHistory,
+        message: 'CI health history analysis completed'
+      };
+
+    } catch (e) {
+      gs.error('CI Health History analysis failed: ' + e.toString());
+      return {
+        success: false,
+        error: 'CI health analysis failed: ' + e.toString(),
+        data: null
+      };
+    }
+  },
+
+  _getCIHealthData: function(ciSysId) {
+    var ciGR = new GlideRecord('cmdb_ci');
+    if (!ciGR.get(ciSysId)) {
+      return { error: 'CI record not accessible or does not exist' };
+    }
+
+    return {
+      sys_id: ciGR.sys_id.toString(),
+      name: ciGR.getDisplayValue('name') || 'Unnamed CI',
+      class: ciGR.getDisplayValue('sys_class_name') || 'Unknown',
+      operational_status: ciGR.getDisplayValue('operational_status') || 'Unknown',
+      install_status: ciGR.getDisplayValue('install_status') || 'Unknown',
+      category: ciGR.getDisplayValue('category') || 'Unclassified',
+      last_discovered: ciGR.getDisplayValue('last_discovered') || 'Unknown'
+    };
+  },
+
+  _analyzeCIHealthHistory: function(incident, windowHours) {
+    var incidentOpenedAt = new GlideDateTime(incident.getValue('opened_at'));
+    var analysisWindowStart = new GlideDateTime(incidentOpenedAt);
+    analysisWindowStart.subtract(windowHours * 60 * 60 * 1000); // Convert hours to milliseconds
+
+    return {
+      time_window: {
+        pre_incident_hours: windowHours,
+        start_time: analysisWindowStart.getValue(),
+        incident_opened_at: incidentOpenedAt.getValue(),
+        incident_sys_id: incident.sys_id.toString()
+      },
+      health_metrics: {
+        stability_score: 100, // Base score, will be adjusted
+        activity_level: 'normal', // normal, high, critical
+        recommendation: []
+      }
+    };
+  },
+
+  _getCIActivityDuringPeriod: function(ciSysId, startTime, endTime) {
+    var activity = {
+      pre_incident_incidents: [],
+      concurrent_incidents: [],
+      related_change_requests: [],
+      sla_events: []
+    };
+
+    // Get other incidents affecting this CI during the analysis window
+    // Excludes the current incident
+    activity.pre_incident_incidents = this._getRelatedCIIncidents(ciSysId, startTime, endTime);
+
+    // Get change requests affecting this CI during timeframe
+    activity.related_change_requests = this._getCIDuringPeriodChanges(ciSysId, startTime, endTime);
+
+    // Get SLA breach events during timeframe (if any linked to this CI)
+    activity.sla_events = this._getCIDuringPeriodSLA(ciSysId, startTime, endTime);
+
+    return activity;
+  },
+
+  _getRelatedCIIncidents: function(ciSysId, startTime, endTime) {
+    var incidents = new GlideRecord('incident');
+    incidents.addQuery('cmdb_ci', ciSysId);
+    incidents.addQuery('opened_at', '>=', startTime);
+    incidents.addQuery('opened_at', '<=', endTime);
+    incidents.addQuery('state', '!=', 'Closed'); // Focus on active/previously active incidents
+    incidents.orderByDesc('opened_at');
+    incidents.setLimit(20); // Prevent excessive data return
+    incidents.query();
+
+    var incidentList = [];
+    while (incidents.next()) {
+      incidentList.push({
+        sys_id: incidents.sys_id.toString(),
+        number: incidents.getDisplayValue('number'),
+        priority: incidents.getDisplayValue('priority'),
+        state: incidents.getDisplayValue('state'),
+        opened_at: incidents.getValue('opened_at'),
+        caller: incidents.getDisplayValue('caller_id'),
+        short_description: incidents.getDisplayValue('short_description') || ''
+      });
+    }
+
+    return incidentList;
+  },
+
+  _getCIDuringPeriodChanges: function(ciSysId, startTime, endTime) {
+    // Find changes that involve this CI through task relationships
+    var changeList = [];
+
+    var changes = new GlideRecord('change_request');
+    changes.addQuery('sys_created_on', '>=', startTime);
+    changes.addQuery('sys_created_on', '<=', endTime);
+    changes.addQuery('state', 'IN', 'New,Assess,Authorize,Scheduled,Implement,Review,Closed');
+    changes.setLimit(15);
+    changes.query();
+
+    while (changes.next()) {
+      // Check if this change is related to the CI through task_rel_task or direct CI field
+      if (changes.cmdb_ci == ciSysId) {
+        changeList.push({
+          sys_id: changes.sys_id.toString(),
+          number: changes.getDisplayValue('number'),
+          type: changes.getDisplayValue('type') || 'Standard',
+          priority: changes.getDisplayValue('priority') || '3',
+          state: changes.getDisplayValue('state'),
+          impact: changes.getDisplayValue('impact') || 'Unknown',
+          risk: changes.getDisplayValue('risk') || 'Unknown',
+          opened_at: changes.getValue('sys_created_on'),
+          planned_start_date: changes.getDisplayValue('start_date') || 'Not set',
+          phase: 'implementation' // Since this is an existing change during the incident
+        });
+      }
+    }
+
+    return changeList;
+  },
+
+  _getCIDuringPeriodSLA: function(ciSysId, startTime, endTime) {
+    // Look for SLA records that were breached or at risk during the analysis timeframe
+    var slaList = [];
+
+    var slas = new GlideRecord('task_sla');
+    slas.addQuery('sys_created_on', '>=', startTime);
+    slas.addQuery('sys_created_on', '<=', endTime);
+    slas.setLimit(10);
+    slas.query();
+
+    while (slas.next()) {
+      // Check if this SLA is related to the CI through incident association
+      var relatedTask = new GlideRecord('incident');
+      if (relatedTask.get(slas.task.toString()) && relatedTask.cmdb_ci == ciSysId) {
+        slaList.push({
+          sla_name: slas.sla.getDisplayValue() || 'Unknown SLA',
+          stage: slas.stage.getDisplayValue(),
+          breach_time: slas.breach_time ? slas.breach_time.getDisplayValue() : null,
+          planned_time: slas.planned_goal_time ? slas.planned_goal_time.getDisplayValue() : null,
+          breached: slas.stage.toString().indexOf('breach') !== -1
+        });
+      }
+    }
+
+    return slaList;
+  },
+
+  _calculateCIStressIndicators: function(healthHistory, originalIncident) {
+    var stressScore = {
+      overload_indicator: 'low',
+      stability_risk: 'low',
+      correlation_insights: [],
+      health_score: 100
+    };
+
+    var activity = healthHistory.related_activity;
+
+    // Count concurrent incidents
+    var concurrentCount = activity.pre_incident_incidents.length;
+
+    // Count active changes
+    var activeChanges = activity.related_change_requests.filter(function(ch) {
+      return ch.state !== 'Closed' && ch.state !== 'Cancelled';
+    }).length;
+
+    // Count SLA breaches
+    var slaBreaches = activity.sla_events.filter(function(sla) {
+      return sla.breached;
+    }).length;
+
+    // Calculate overall stress indicators
+    if (concurrentCount >= 3) {
+      stressScore.overload_indicator = 'high';
+      stressScore.correlation_insights.push('High incident concurrency - CI may be experiencing related issues');
+      stressScore.health_score -= 25;
+    } else if (concurrentCount >= 1) {
+      stressScore.overload_indicator = 'medium';
+      stressScore.correlation_insights.push('Multiple incidents affecting same CI');
+      stressScore.health_score -= 10;
+    }
+
+    if (activeChanges >= 2) {
+      stressScore.stability_risk = 'medium';
+      stressScore.correlation_insights.push('Multiple concurrent changes involving CI');
+      stressScore.health_score -= 15;
+    } else if (activeChanges >= 1) {
+      stressScore.stability_risk = 'low';
+      stressScore.correlation_insights.push('Change activity around incident time');
+    }
+
+    if (slaBreaches >= 1) {
+      stressScore.stability_risk = 'high';
+      stressScore.correlation_insights.push('SLA breaches indicate service level pressure');
+      stressScore.health_score -= 20;
+    }
+
+    // Generate recommendations
+    if (stressScore.health_score < 75) {
+      stressScore.correlation_insights.push('RECOMMENDATION: Consider CI maintenance or monitoring enhancement');
+    }
+
+    if (concurrentCount > 0 && activeChanges > 0) {
+      stressScore.correlation_insights.push('RECOMMENDATION: Evaluate change readiness - incident occurred during change window');
+    }
+
+    healthHistory.stress_indicators = stressScore;
+    healthHistory.correlation_score = concurrentCount + (activeChanges * 2) + (slaBreaches * 3); // Weighted score
+
+    return healthHistory;
+  },
+
   assessCategorizationQuality: function(sys_id) {
     var incident = new GlideRecord('incident');
     if (!incident.get(sys_id)) return { confidence_score: 0, categories: {}, suggestions: [] };
