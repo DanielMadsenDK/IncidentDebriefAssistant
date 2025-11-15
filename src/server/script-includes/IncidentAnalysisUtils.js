@@ -146,8 +146,13 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
       hierarchy: this.getIncidentHierarchy(sys_id),
       problem_link: this.getProblemLink(sys_id),
       sla_compliance: this.getSLACompliance(sys_id),
-      ci_impact_network: this.getCIImpactNetwork(sys_id, 2),
-      change_interventions: this.getChangeInterventions(sys_id),
+      // Temporarily disable advanced methods to debug
+      // ci_impact_network: this.getCIImpactNetwork(sys_id, 2),
+      // change_interventions: this.getChangeInterventions(sys_id),
+      // assignee_workload: this.calculateAssigneeWorkload(sys_id),
+      // categorization_quality: this.assessCategorizationQuality(sys_id),
+      ci_impact_network: { primary_ci: {}, dependencies: [], impact_score: 5 },
+      change_interventions: { related_changes: [], changes_implemented: 0, effectiveness_rating: 'unknown' },
       assignee_workload: this.calculateAssigneeWorkload(sys_id),
       categorization_quality: this.assessCategorizationQuality(sys_id),
       ci_details: this.getCIDetails(sys_id)
@@ -312,36 +317,51 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
   },
 
   getCIImpactNetwork: function(sys_id, maxDepth) {
-    var incident = new GlideRecord('incident');
-    if (!incident.get(sys_id) || !incident.cmdb_ci) return { primary_ci: {}, dependencies: [], impact_score: 0 };
+    try {
+      var incident = new GlideRecord('incident');
+      if (!incident.get(sys_id) || !incident.cmdb_ci) {
+        return { primary_ci: {}, dependencies: [], impact_score: 0 };
+      }
 
-    var network = {
-      primary_ci: {},
-      dependencies: [],
-      impacted_services: [],
-      impact_score: 5, // Default medium impact
-      depth_analyzed: 0
-    };
-
-    // Get primary CI details
-    var ci = new GlideRecord('cmdb_ci');
-    if (ci.get(incident.cmdb_ci.sys_id)) {
-      network.primary_ci = {
-        sys_id: ci.sys_id,
-        name: ci.getDisplayValue('name'),
-        class: ci.getDisplayValue('sys_class_name'),
-        install_status: ci.getDisplayValue('install_status'),
-        operational_status: ci.getDisplayValue('operational_status'),
-        impact: ci.getValue('u_impact') || 5
+      var network = {
+        primary_ci: {},
+        dependencies: [],
+        impacted_services: [],
+        impact_score: 5, // Default medium impact
+        depth_analyzed: 0,
+        error: null
       };
-      network.impact_score = network.primary_ci.impact;
+
+      // Get primary CI details
+      var ci = new GlideRecord('cmdb_ci');
+      if (ci.get(incident.cmdb_ci.toString())) {
+        network.primary_ci = {
+          sys_id: ci.sys_id.toString(),
+          name: ci.getDisplayValue('name') || 'Unknown CI',
+          class: ci.getDisplayValue('sys_class_name') || 'cmdb_ci',
+          install_status: ci.getDisplayValue('install_status') || 'Unknown',
+          operational_status: ci.getDisplayValue('operational_status') || 'Unknown',
+          impact: parseInt(ci.getValue('u_impact')) || 5
+        };
+        network.impact_score = network.primary_ci.impact;
+      }
+
+      // Analyze CI relationships - limit depth to prevent performance issues
+      var maxDepth = maxDepth || 2;
+      network = this._analyzeCIDependencies(ci.sys_id.toString(), maxDepth, network, 1);
+
+      return network;
+    } catch (e) {
+      gs.warn('CI Impact Network analysis failed: ' + e.toString());
+      return {
+        primary_ci: {},
+        dependencies: [],
+        impacted_services: [],
+        impact_score: 5,
+        depth_analyzed: 0,
+        error: e.toString()
+      };
     }
-
-    // Analyze CI relationships - limit depth to prevent performance issues
-    var maxDepth = maxDepth || 2;
-    this._analyzeCIDependencies(ci.sys_id, maxDepth, network, 1);
-
-    return network;
   },
 
   _analyzeCIDependencies: function(ciSysId, maxDepth, network, currentDepth) {
