@@ -288,16 +288,14 @@ export default function CIHealthHistoryCard({ incident, onLoad }) {
           {/* CI Configuration Details - Actionable Insights Pattern */}
           <div className="actions-grid">
             <div className="action-section">
-              <h4 className="section-title">💻 Configuration Item</h4>
-              <ul className="action-list">
-                <li className="action-item">💽 {healthData.ci_info.name || 'Unknown Configuration Item'}</li>
-              </ul>
+              <h4 className="section-title">
+                💻 Configuration Item: <span className="section-value">{healthData.ci_info.name || 'Unknown Configuration Item'}</span>
+              </h4>
             </div>
             <div className="action-section">
-              <h4 className="section-title">⏰ Analysis Window</h4>
-              <ul className="action-list">
-                <li className="action-item">⏳ {healthData.health_analysis.time_window.pre_incident_hours} hours pre-incident</li>
-              </ul>
+              <h4 className="section-title">
+                ⏰ Analysis Window: <span className="section-value">{healthData.health_analysis.time_window.pre_incident_hours} hours pre-incident</span>
+              </h4>
             </div>
           </div>
 
