@@ -138,7 +138,6 @@ export default function LandingPage({ onNavigateToAnalysis }) {
       <div className="hero-section">
         <div className="hero-gradient-bg"></div>
         <div className="hero-content">
-          <div className="hero-badge">🔬 Advanced Incident Intelligence</div>
           <h1 className="hero-title">
             Incident Debrief
             <span className="hero-accent">Assistant</span>
@@ -146,20 +145,6 @@ export default function LandingPage({ onNavigateToAnalysis }) {
           <p className="hero-subtitle">
             Transform incident investigations with deterministic data processing, intelligent timeline reconstruction, and actionable insights powered by advanced analysis algorithms.
           </p>
-          <div className="hero-metrics">
-            <div className="metric-item">
-              <span className="metric-value">98%</span>
-              <span className="metric-label">Analysis Accuracy</span>
-            </div>
-            <div className="metric-item">
-              <span className="metric-value">Under 30s</span>
-              <span className="metric-label">Response Time</span>
-            </div>
-            <div className="metric-item">
-              <span className="metric-value">24/7</span>
-              <span className="metric-label">Always Available</span>
-            </div>
-          </div>
         </div>
       </div>
 
