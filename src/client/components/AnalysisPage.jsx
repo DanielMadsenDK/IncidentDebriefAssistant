@@ -55,7 +55,7 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
           <h2>Analysis Failed</h2>
           <p>{error}</p>
           <button onClick={onNavigateToLanding} className="back-button">
-            Back to Landing
+            Back
           </button>
         </div>
       </div>
@@ -68,18 +68,22 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
 
   return (
     <div className="analysis-page">
+      {/* Premium Back Button */}
       <button onClick={onNavigateToLanding} className="analysis-back-button">
-        ← Back to Landing
+        ← Back
       </button>
+
+      {/* Main Analysis Container */}
       <div className="analysis-card">
-        {/* Header Section - Incident Metadata */}
+        {/* Premium Floating Header */}
         <div className="header-card">
           <div className="incident-header-content">
             <div className="incident-primary-info">
+              <div className="incident-summary-badge">📋 Incident Analysis Report</div>
               <h1 className="incident-number" data-text={incident?.number}>{incident?.number}</h1>
               <p className="incident-description">{incident?.short_description}</p>
             </div>
-            
+
             <div className="incident-status-grid">
               <div className="status-item">
                 <span className="status-label">State</span>
@@ -113,42 +117,42 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
           </div>
         </div>
 
-        {/* Main Content Sections */}
+        {/* Premium Content Sections */}
         <div className="content-grid">
-          {/* Metrics Section - immediately under header */}
+          {/* Key Metrics Section */}
           <div className="debrief-card">
             <div className="card-header">
               <h2 className="card-title">
-                Metrics
+                📊 Key Performance Metrics
               </h2>
             </div>
             <div className="card-content">
               <div className="metrics-grid">
-                <MetricItem 
+                <MetricItem
                   icon="⏱️"
                   label="Resolution Time"
                   value={debrief?.resolution_time?.display || 'N/A'}
                   status={debrief?.resolution_time?.is_resolved ? 'resolved' : 'active'}
                 />
-                <MetricItem 
+                <MetricItem
                   icon="🔄"
                   label="Assignment Changes"
                   value={debrief?.handoff_count || 0}
                   subtitle={`${debrief?.groups_involved?.length || 0} groups involved`}
                 />
-                <MetricItem 
+                <MetricItem
                   icon="💬"
                   label="Communication"
                   value={debrief?.note_count?.total || 0}
                   subtitle={`${debrief?.note_count?.comments || 0} comments, ${debrief?.note_count?.work_notes || 0} notes`}
                 />
-                <MetricItem 
+                <MetricItem
                   icon="📈"
                   label="State Changes"
                   value={debrief?.state_changes || 0}
                   subtitle={`${debrief?.priority_changes || 0} priority changes`}
                 />
-                <MetricItem 
+                <MetricItem
                   icon="⚡"
                   label="First Response"
                   value={debrief?.first_response_time?.display || 'No response'}
@@ -158,16 +162,16 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
             </div>
           </div>
 
-          {/* Timeline Section (horizontal) */}
+          {/* Comprehensive Timeline Section */}
           <div className="timeline-section">
             <div className="timeline-card">
               <div className="card-header">
                 <h2 className="card-title">
-                  Incident Timeline
+                  🕐 Incident Timeline
                 </h2>
                 <span className="timeline-count">{timeline.length} events</span>
               </div>
-              
+
               <div className="timeline-container">
                 {timeline.map((event, index) => (
                   <TimelineEvent key={index} event={event} isLast={index === timeline.length - 1} />
@@ -176,51 +180,51 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
             </div>
           </div>
 
-          {/* Debrief Section (Overview & Actions) */}
+          {/* Analysis & Recommendations */}
           <div className="debrief-section">
-            {/* Overview */}
+            {/* Root Cause Analysis */}
             <div className="debrief-card">
               <div className="card-header">
                 <h2 className="card-title">
-                  Overview
+                  🔍 Analysis Summary
                 </h2>
               </div>
               <div className="card-content">
                 <div className="overview-grid">
                   <div className="overview-item">
-                    <span className="overview-label">Root Cause</span>
+                    <span className="overview-label">Root Cause Analysis</span>
                     <p className="overview-value">{analysisData?.rootCause || 'Analysis pending'}</p>
                   </div>
                   <div className="overview-item">
-                    <span className="overview-label">Impact Assessment</span>
+                    <span className="overview-label">Business Impact Assessment</span>
                     <p className="overview-value">{analysisData?.impact || 'Assessment pending'}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Actions Taken */}
+            {/* Actionable Insights */}
             <div className="debrief-card">
               <div className="card-header">
                 <h2 className="card-title">
-                  Actions Taken
+                  💡 Actionable Insights
                 </h2>
               </div>
               <div className="card-content">
                 <div className="actions-grid">
                   <div className="action-section">
-                    <h4 className="section-title">Recommendations</h4>
+                    <h4 className="section-title">📋 Immediate Recommendations</h4>
                     <ul className="action-list">
                       {analysisData?.recommendations?.map((rec, index) => (
-                        <li key={index} className="action-item">{rec}</li>
+                        <li key={index} className="action-item">💡 {rec}</li>
                       )) || <li className="no-data">No recommendations available</li>}
                     </ul>
                   </div>
                   <div className="action-section">
-                    <h4 className="section-title">Prevention Measures</h4>
+                    <h4 className="section-title">🛡️ Prevention Measures</h4>
                     <ul className="action-list">
                       {analysisData?.preventionMeasures?.map((measure, index) => (
-                        <li key={index} className="action-item">{measure}</li>
+                        <li key={index} className="action-item">🛡️ {measure}</li>
                       )) || <li className="no-data">No prevention measures identified</li>}
                     </ul>
                   </div>
