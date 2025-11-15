@@ -248,7 +248,7 @@ export default function CIHealthHistoryCard({ incident, onLoad }) {
   };
 
   return (
-    <div className="ci-health-premium-card">
+    <div className="debrief-card ci-health-premium">
       {/* Premium Header Banner */}
       <div className="ci-health-header-banner">
         <div className="ci-health-header-overlay">

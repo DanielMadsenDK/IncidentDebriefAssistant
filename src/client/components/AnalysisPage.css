@@ -1209,8 +1209,8 @@
    PREMIUM CI HEALTH HISTORY STYLES
    =================================== */
 
-/* Main Premium Card */
-.ci-health-premium-card {
+/* Main Premium Card - Applied to base debrief-card */
+.debrief-card.ci-health-premium {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px);
   border-radius: 20px;
