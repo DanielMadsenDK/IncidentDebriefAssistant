@@ -1050,6 +1050,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1.25rem;
+  margin-top: 25px;
 }
 
 .metric-item {
