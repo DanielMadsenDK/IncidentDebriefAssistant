@@ -138,7 +138,15 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
       impact: gr.getDisplayValue('impact'),
       urgency: gr.getDisplayValue('urgency'),
       sys_created_on: gr.getDisplayValue('sys_created_on'),
-      sys_updated_on: gr.getDisplayValue('sys_updated_on')
+      sys_updated_on: gr.getDisplayValue('sys_updated_on'),
+      // New fields from High/Medium priority features
+      close_code: gr.getDisplayValue('close_code'),
+      reopen_count: gr.getValue('reopen_count') || 0,
+      business_duration: gr.getValue('business_duration'),
+      hierarchy: this.getIncidentHierarchy(sys_id),
+      problem_link: this.getProblemLink(sys_id),
+      sla_compliance: this.getSLACompliance(sys_id),
+      ci_details: this.getCIDetails(sys_id)
     };
   },
 
@@ -227,6 +235,95 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
     return fieldName + ' changed from "' + (oldValue || '(empty)') + '" to "' + (newValue || '(empty)') + '"';
   },
 
+  getIncidentHierarchy: function(sys_id) {
+    var incident = new GlideRecord('incident');
+    if (!incident.get(sys_id)) return { has_parent: false, child_count: 0 };
+
+    var hierarchy = {
+      has_parent: !!incident.parent_incident,
+      parent_incident: {},
+      child_count: 0
+    };
+
+    // Get parent details if exists
+    if (incident.parent_incident) {
+      var parent = new GlideRecord('incident');
+      if (parent.get(incident.parent_incident.sys_id)) {
+        hierarchy.parent_incident = {
+          sys_id: parent.sys_id,
+          number: parent.getDisplayValue('number'),
+          short_description: parent.getDisplayValue('short_description'),
+          state: parent.getDisplayValue('state'),
+          opened_at: parent.getDisplayValue('opened_at')
+        };
+      }
+    }
+
+    // Count children (avoid full load for performance)
+    var childQuery = new GlideRecord('incident');
+    childQuery.addQuery('parent_incident', sys_id);
+    childQuery.query();
+    hierarchy.child_count = childQuery.getRowCount();
+
+    return hierarchy;
+  },
+
+  getProblemLink: function(sys_id) {
+    var incident = new GlideRecord('incident');
+    if (!incident.get(sys_id)) return null;
+
+    if (!incident.problem_id) return null;
+
+    var problem = new GlideRecord('problem');
+    if (!problem.get(incident.problem_id)) return null;
+
+    return {
+      sys_id: problem.sys_id,
+      number: problem.getDisplayValue('number'),
+      short_description: problem.getDisplayValue('short_description'),
+      state: problem.getDisplayValue('state'),
+      priority: problem.getDisplayValue('priority'),
+      opened_at: problem.getDisplayValue('opened_at'),
+      resolved_at: problem.getDisplayValue('resolved_at')
+    };
+  },
+
+  getSLACompliance: function(sys_id) {
+    var slaGR = new GlideRecord('task_sla');
+    slaGR.addQuery('task', sys_id);
+    slaGR.addQuery('record', 'incident');
+    slaGR.query();
+
+    var slas = [];
+    while (slaGR.next()) {
+      slas.push({
+        sys_id: slaGR.sys_id,
+        sla_name: slaGR.sla.getDisplayValue(),
+        stage: slaGR.stage.getDisplayValue(),
+        breach_time: slaGR.breach_time ? slaGR.breach_time.getDisplayValue() : null,
+        planned_goal_time: slaGR.planned_goal_time ? slaGR.planned_goal_time.getDisplayValue() : null
+      });
+    }
+    return slas;
+  },
+
+  getCIDetails: function(sys_id) {
+    var incident = new GlideRecord('incident');
+    if (!incident.get(sys_id) || !incident.cmdb_ci) return null;
+
+    var ci = new GlideRecord('cmdb_ci');
+    if (!ci.get(incident.cmdb_ci.sys_id)) return null;
+
+    return {
+      sys_id: ci.sys_id,
+      name: ci.getDisplayValue('name'),
+      class: ci.getDisplayValue('sys_class_name'),
+      impact: ci.getValue('u_impact') || 5, // Custom field, default to medium (5)
+      install_status: ci.getDisplayValue('install_status'),
+      operational_status: ci.getDisplayValue('operational_status')
+    };
+  },
+
   _generateDebrief: function(incident, timeline) {
     var debrief = {
       resolution_time: this._calculateResolutionTime(incident),
@@ -235,9 +332,14 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
       note_count: this._countNotes(timeline),
       state_changes: this._countStateChanges(timeline),
       priority_changes: this._countPriorityChanges(timeline),
+      reopen_count: incident.reopen_count || 0,
       cause_summary: this._generateCauseSummary(timeline),
       first_response_time: this._calculateFirstResponseTime(incident, timeline),
-      key_events: this._identifyKeyEvents(timeline)
+      key_events: this._identifyKeyEvents(timeline),
+      // Enhanced metrics
+      resolution_quality: this._calculateResolutionQuality(incident),
+      hierarchy_complexity: this._calculateHierarchyComplexity(incident),
+      sla_compliance_score: this._calculateSLAComplianceScore(incident, timeline)
     };
 
     return debrief;
@@ -452,6 +554,109 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
     });
 
     return keyEvents;
+  },
+
+  _calculateResolutionQuality: function(incident) {
+    var quality = {
+      score: 50, // Base score out of 100
+      factors: []
+    };
+
+    // Close code analysis - positive if properly documented, negative if not
+    if (incident.close_code && incident.close_code !== '') {
+      quality.score += 20;
+      quality.factors.push('Resolution code documented');
+      var closeCode = incident.close_code.toUpperCase();
+      if (closeCode.indexOf('WON\'T FIX') === -1 && closeCode.indexOf('DUPLICATE') === -1) {
+        quality.factors.push('Provides actionable resolution type');
+      } else {
+        quality.score -= 10;
+      }
+    } else {
+      quality.factors.push('Missing close code');
+      quality.score -= 20;
+    }
+
+    // Reopen factor
+    var reopenCount = incident.reopen_count || 0;
+    if (reopenCount === 0) {
+      quality.score += 20;
+      quality.factors.push('No reopens - permanent solution');
+    } else if (reopenCount <= 2) {
+      quality.factors.push('Minimal reopens - acceptable');
+    } else {
+      quality.score -= 15;
+      quality.factors.push('Multiple reopens - solution quality concern');
+    }
+
+    return quality;
+  },
+
+  _calculateHierarchyComplexity: function(incident) {
+    var complexity = {
+      score: 0, // Out of 10
+      factors: []
+    };
+
+    // Parent existence
+    if (incident.hierarchy && incident.hierarchy.has_parent) {
+      complexity.score += 3;
+      complexity.factors.push('Part of parent incident chain');
+    }
+
+    // Child incidents
+    if (incident.hierarchy && incident.hierarchy.child_count > 0) {
+      complexity.score += incident.hierarchy.child_count;
+      complexity.factors.push(incident.hierarchy.child_count + ' child incidents spawned');
+    }
+
+    // Related problem
+    if (incident.problem_link) {
+      complexity.score += 2;
+      if (incident.problem_link.state === 'Resolved' || incident.problem_link.state === 'Closed') {
+        complexity.factors.push('Linked to resolved problem');
+      } else {
+        complexity.score += 1;
+        complexity.factors.push('Linked to active problem');
+      }
+    }
+
+    return complexity;
+  },
+
+  _calculateSLAComplianceScore: function(incident, timeline) {
+    var compliance = {
+      score: 0, // Out of 100
+      breeches: 0,
+      total_slas: 0,
+      factors: []
+    };
+
+    if (!incident.sla_compliance || incident.sla_compliance.length === 0) {
+      compliance.factors.push('No SLAs attached');
+      return compliance;
+    }
+
+    compliance.total_slas = incident.sla_compliance.length;
+
+    incident.sla_compliance.forEach(function(sla) {
+      if (sla.stage && sla.stage.toLowerCase().indexOf('breach') !== -1) {
+        compliance.breeches += 1;
+      }
+    });
+
+    if (compliance.total_slas > 0) {
+      var complianceRate = ((compliance.total_slas - compliance.breeches) / compliance.total_slas) * 100;
+      compliance.score = Math.round(complianceRate);
+    }
+
+    if (compliance.breeches === 0) {
+      compliance.factors.push('All SLAs met');
+    } else {
+      compliance.factors.push(compliance.breeches + ' SLA breaches');
+    }
+
+    return compliance;
   },
 
   type: 'IncidentAnalysisUtils'

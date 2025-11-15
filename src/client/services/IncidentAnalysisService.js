@@ -94,7 +94,7 @@ export default class IncidentAnalysisService {
     const handoffs = debrief.handoff_count;
 
     let assessment = `Priority ${priority} incident affecting business operations. `;
-    
+
     if (resolutionTime.is_resolved) {
       assessment += `Resolved in ${resolutionTime.display}. `;
     } else {
@@ -105,7 +105,33 @@ export default class IncidentAnalysisService {
       assessment += `Involved ${handoffs} assignment changes across ${debrief.groups_involved.length} groups. `;
     }
 
-    assessment += `Generated ${debrief.note_count.total} notes (${debrief.note_count.comments} comments, ${debrief.note_count.work_notes} work notes).`;
+    assessment += `Generated ${debrief.note_count.total} notes (${debrief.note_count.comments} comments, ${debrief.note_count.work_notes} work notes). `;
+
+    // Add new metrics to impact assessment
+    if (incident.hierarchy && incident.hierarchy.complexity) {
+      assessment += `Hierarchy complexity score: ${incident.hierarchy.complexity.score}/10. `;
+    }
+
+    if (incident.sla_compliance && incident.sla_compliance.score !== undefined) {
+      const slaScore = incident.sla_compliance.score;
+      assessment += `SLA compliance: ${slaScore}%. `;
+    }
+
+    if (incident.resolution_quality) {
+      assessment += `Resolution quality: ${incident.resolution_quality.score}/100. `;
+    }
+
+    if (incident.problem_link) {
+      assessment += `Linked to problem record. `;
+    }
+
+    if (incident.close_code) {
+      assessment += `Closed with code: ${incident.close_code}. `;
+    }
+
+    if (incident.reopen_count > 0) {
+      assessment += `Reopened ${incident.reopen_count} time(s). `;
+    }
 
     return assessment;
   }
@@ -141,6 +167,25 @@ export default class IncidentAnalysisService {
     // Based on response time
     if (debrief.first_response_time.value > 3600) { // > 1 hour
       recommendations.push("Improve first response time - currently exceeding 1 hour");
+    }
+
+    // New recommendations based on enhanced metrics
+    if (debrief.resolution_quality && debrief.resolution_quality.score < 60) {
+      recommendations.push("Review resolution documentation and close code practices");
+      recommendations.push("Provide training on proper incident closure procedures");
+    }
+
+    if (debrief.hierarchy_complexity && debrief.hierarchy_complexity.score > 3) {
+      recommendations.push("Complex incident hierarchies may indicate systemic issues - consider problem management escalation");
+    }
+
+    if (debrief.sla_compliance_score && debrief.sla_compliance_score.score < 80) { // SLA below 80%
+      recommendations.push("Review SLA performance and response time goals");
+      recommendations.push("Consider process improvements for better SLA compliance");
+    }
+
+    if (debrief.reopen_count > 1) {
+      recommendations.push("Multiple reopens indicate solution verification issues - review post-resolution monitoring");
     }
 
     // General recommendations

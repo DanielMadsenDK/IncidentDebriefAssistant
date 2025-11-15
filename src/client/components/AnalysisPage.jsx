@@ -158,6 +158,55 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
                   value={debrief?.first_response_time?.display || 'No response'}
                   subtitle={debrief?.first_response_time?.response_by || ''}
                 />
+                {/* New enhanced metrics */}
+                {debrief?.resolution_quality && (
+                  <MetricItem
+                    icon="🏆"
+                    label="Resolution Quality"
+                    value={`${debrief.resolution_quality.score || 0}/100`}
+                    subtitle={debrief.resolution_quality.factors?.[0] || ''}
+                  />
+                )}
+                {debrief?.hierarchy_complexity && (
+                  <MetricItem
+                    icon="🔗"
+                    label="Hierarchy Complexity"
+                    value={`${debrief.hierarchy_complexity.score || 0}/10`}
+                    subtitle={debrief.hierarchy_complexity.factors?.[0] || ''}
+                  />
+                )}
+                {debrief?.sla_compliance_score && (
+                  <MetricItem
+                    icon="⏱️"
+                    label="SLA Compliance"
+                    value={`${debrief.sla_compliance_score.score || 0}%`}
+                    subtitle={debrief.sla_compliance_score.factors?.join(', ') || ''}
+                  />
+                )}
+                {incident?.close_code && (
+                  <MetricItem
+                    icon="📋"
+                    label="Close Code"
+                    value={incident.close_code}
+                    subtitle={`Reopens: ${incident.reopen_count || 0}`}
+                  />
+                )}
+                {incident?.problem_link && (
+                  <MetricItem
+                    icon="🎯"
+                    label="Problem Linked"
+                    value={incident.problem_link.number || 'Linked'}
+                    subtitle={incident.problem_link.state === 'Closed' ? 'Resolved problem' : 'Active problem'}
+                  />
+                )}
+                {incident?.ci_details && (
+                  <MetricItem
+                    icon="💻"
+                    label="Configuration Item"
+                    value={incident.ci_details.name || 'N/A'}
+                    subtitle={`Class: ${incident.ci_details.class || 'Unknown'}`}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -180,6 +229,11 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
 
           {/* Analysis & Recommendations */}
           <div className="debrief-section">
+            {/* Related Records */}
+            {(incident?.hierarchy?.has_parent || incident?.problem_link || incident?.ci_details || incident?.sla_compliance?.length > 0) && (
+              <RelatedRecordsCard incident={incident} />
+            )}
+
             {/* Root Cause Analysis */}
             <div className="debrief-card">
               <div className="card-header">
@@ -450,6 +504,87 @@ function MetricItem({ icon, label, value, subtitle, status }) {
       <div className="metric-value">{value}</div>
       {subtitle && <div className="metric-subtitle">{subtitle}</div>}
       {status && <div className={`metric-status ${status}`}>{status}</div>}
+    </div>
+  );
+}
+
+// Related Records Card Component
+function RelatedRecordsCard({ incident }) {
+  return (
+    <div className="debrief-card">
+      <div className="card-header">
+        <h2 className="card-title">
+          🔗 Related Records
+        </h2>
+      </div>
+      <div className="card-content">
+        <div className="related-records-grid">
+          {incident?.hierarchy?.has_parent && incident.hierarchy.parent_incident && (
+            <div className="related-record-item">
+              <div className="related-record-icon">⬆️</div>
+              <div className="related-record-info">
+                <div className="related-record-label">Parent Incident</div>
+                <div className="related-record-value">{incident.hierarchy.parent_incident.number}</div>
+                <div className="related-record-meta">
+                  {incident.hierarchy.parent_incident.state} • {new Date(incident.hierarchy.parent_incident.opened_at).toLocaleDateString()}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {incident?.hierarchy?.child_count > 0 && (
+            <div className="related-record-item">
+              <div className="related-record-icon">⬇️</div>
+              <div className="related-record-info">
+                <div className="related-record-label">Child Incidents</div>
+                <div className="related-record-value">{incident.hierarchy.child_count} incidents</div>
+                <div className="related-record-meta">Spawned during resolution</div>
+              </div>
+            </div>
+          )}
+
+          {incident?.problem_link && (
+            <div className="related-record-item">
+              <div className="related-record-icon">🎯</div>
+              <div className="related-record-info">
+                <div className="related-record-label">Problem Record</div>
+                <div className="related-record-value">{incident.problem_link.number}</div>
+                <div className="related-record-meta">
+                  {incident.problem_link.state} • {new Date(incident.problem_link.opened_at).toLocaleDateString()}
+                  {incident.problem_link.resolved_at && ` · Resolved ${new Date(incident.problem_link.resolved_at).toLocaleDateString()}`}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {incident?.ci_details && (
+            <div className="related-record-item">
+              <div className="related-record-icon">💻</div>
+              <div className="related-record-info">
+                <div className="related-record-label">Configuration Item</div>
+                <div className="related-record-value">{incident.ci_details.name}</div>
+                <div className="related-record-meta">
+                  {incident.ci_details.class} • {incident.ci_details.install_status}
+                  {incident.ci_details.impact && ` • Impact: ${incident.ci_details.impact}/5`}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {incident?.sla_compliance?.length > 0 && (
+            <div className="related-record-item">
+              <div className="related-record-icon">⏱️</div>
+              <div className="related-record-info">
+                <div className="related-record-label">SLA Records</div>
+                <div className="related-record-value">{incident.sla_compliance.length} attached</div>
+                <div className="related-record-meta">
+                  {incident.sla_compliance.filter(sla => sla.stage === 'Breached').length} breached
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
