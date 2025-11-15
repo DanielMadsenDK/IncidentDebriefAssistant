@@ -365,7 +365,7 @@
   padding: 1.5rem 2rem 1rem;
   border-bottom: 1px solid rgba(0, 115, 230, 0.1);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   background: linear-gradient(135deg, rgba(0, 115, 230, 0.03) 0%, rgba(40, 167, 69, 0.03) 100%);
   position: relative;
@@ -636,6 +636,24 @@
   position: relative;
 }
 
+/* Horizontal connecting line between timeline dots */
+.horizontal-timeline-events-container::before {
+  content: '';
+  position: absolute;
+  top: 25px; /* Center vertically on the dots (50px height / 2) */
+  left: 75px; /* Start after left padding and half dot width */
+  right: 75px; /* End before right padding and half dot width */
+  height: 3px;
+  background: linear-gradient(135deg, #0073e6 0%, rgba(0, 115, 230, 0.6) 50%, rgba(0, 115, 230, 0.3) 100%);
+  border-radius: 2px;
+  z-index: 0; /* Behind the dots */
+}
+
+/* Remove connecting line on last item */
+.horizontal-timeline-item:last-child .horizontal-timeline-point::after {
+  display: none;
+}
+
 .horizontal-timeline-item {
   display: flex;
   flex-direction: column;
@@ -657,7 +675,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0073e6 0%, #00a6ff 100%);
+  background: #0073e6;
   border: 4px solid rgba(255, 255, 255, 0.95);
   box-shadow: 0 6px 20px rgba(0, 115, 230, 0.3);
   backdrop-filter: blur(8px);
