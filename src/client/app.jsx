@@ -58,26 +58,12 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>Incident Debrief Assistant</h1>
-        <nav className="app-nav">
-          {currentPage === 'analysis' && (
-            <button 
-              onClick={navigateToLanding}
-              className="nav-button"
-            >
-              Back to Landing
-            </button>
-          )}
-        </nav>
-      </header>
-      
       <main className="app-main">
         {currentPage === 'landing' ? (
           <LandingPage onNavigateToAnalysis={navigateToAnalysis} />
         ) : (
-          <AnalysisPage 
-            incidentSysId={incidentSysId} 
+          <AnalysisPage
+            incidentSysId={incidentSysId}
             onNavigateToLanding={navigateToLanding}
           />
         )}
