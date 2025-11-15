@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+  <sys_app_application action="DELETE">
+    <sys_id>fa61832704e34fdf9de9ac8fe8524113</sys_id>
+    <sys_scope display_value="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_scope>
+    <active>true</active>
+    <category/>
+    <description>Comprehensive incident analysis, timeline review, and debrief metrics</description>
+    <device_type>browser</device_type>
+    <hint>Tools for incident analysis and debrief</hint>
+    <name/>
+    <order>100</order>
+    <roles/>
+    <title>Incident Debrief Assistant</title>
+  </sys_app_application>
+<sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="Incident Deb">41d6f38453913210030191e0a0490ea0</application>
+        <file_path/>
+        <instance_id>9e4b0b66dbf5f55002d91729139619e1</instance_id>
+        <instance_name>dev184503</instance_name>
+        <name>sys_app_application_fa61832704e34fdf9de9ac8fe8524113</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update>
+  <sys_app_application action="INSERT_OR_UPDATE">
+    <sys_id>fa61832704e34fdf9de9ac8fe8524113</sys_id>
+    <sys_scope display_value="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_scope>
+    <active>true</active>
+    <category/>
+    <description>Comprehensive incident analysis, timeline review, and debrief metrics</description>
+    <device_type>browser</device_type>
+    <hint>Tools for incident analysis and debrief</hint>
+    <name/>
+    <order>100</order>
+    <roles/>
+    <title>Incident Debrief Assistant</title>
+  </sys_app_application>
+</record_update>]]></payload>
+        <payload_hash>1395066782</payload_hash>
+        <record_name>Incident Debrief Assistant</record_name>
+        <reverted_from/>
+        <source/>
+        <source_table>sys_upgrade_history</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-15 10:07:50</sys_created_on>
+        <sys_id>f927c4e853d1b210030191e0a0490e76</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>19a86fc41c90000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-15 10:07:50</sys_updated_on>
+        <type>Application Menu</type>
+        <update_guid>b927c4e8ead1b210a2bae9383fb37176</update_guid>
+        <update_guid_history>b927c4e8ead1b210a2bae9383fb37176:1395066782</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete display_value="Incident Debrief Assistant">115dd02c5395b210030191e0a0490ecf</sys_audit_delete>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-15 11:44:45</sys_created_on>
+        <sys_db_object display_value="" name="sys_app_application">sys_app_application</sys_db_object>
+        <sys_id>78f8da340c2142dc81a74658f84525d9</sys_id>
+        <sys_metadata>fa61832704e34fdf9de9ac8fe8524113</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Incident Debrief Assistant</sys_name>
+        <sys_package display_value="Incident Deb" source="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="Incident Deb">41d6f38453913210030191e0a0490ea0</sys_scope>
+        <sys_scope_delete display_value="">04f587f805d34ba283454efa99b274d1</sys_scope_delete>
+        <sys_update_name>sys_app_application_fa61832704e34fdf9de9ac8fe8524113</sys_update_name>
+        <sys_update_version display_value="sys_app_application_fa61832704e34fdf9de9ac8fe8524113">f927c4e853d1b210030191e0a0490e76</sys_update_version>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-15 11:44:45</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>

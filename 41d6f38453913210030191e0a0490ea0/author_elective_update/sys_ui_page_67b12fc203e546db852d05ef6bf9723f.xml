@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+  <sys_ui_page action="DELETE">
+    <sys_id>67b12fc203e546db852d05ef6bf9723f</sys_id>
+    <sys_scope display_value="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_scope>
+    <category>general</category>
+    <client_script/>
+    <description>React-based UI for incident analysis and debrief with server-side processing</description>
+    <direct>true</direct>
+    <endpoint>x_1118332_incident_debrief_assistant.do</endpoint>
+    <html><![CDATA[
+<!-- @fluent-import-html WARNING: This file was imported from the output of a static build. Modifications of any kind are likely to result in unintended behavior. In most cases, you should edit the source file of the HTML imported below. If you are absolutely certain you want to take control of this HTML, you can remove this comment to prevent the SDK from regenerating it. However, you will then be responsible for the management of this HTML in your Fluent file. -->
+<html>
+  <head>
+    <title>Incident Debrief Assistant</title>
+    <!-- Initialize globals and Include ServiceNow's required scripts -->
+    <!-- @sdk:now-ux-globals -->
+    <!-- Resolved from sdk:now-ux-globals tag at NowSDK build time to support earlier Glide releases -->
+    <script>window.NOW = {};
+window.NOW.user = {};
+window.NOW.batch_glide_ajax_requests = false;
+window.g_ck = "$[gs.getSession().getSessionToken()]";</script>
+    <!-- Include ServiceNow's required scripts -->
+    <g:requires name="scripts/doctype/functions_bootstrap14.js"></g:requires>
+    <g:requires name="scripts/lib/prototype.js"></g:requires>
+    <g:requires name="scripts/classes/ajax/GlideURL.js"></g:requires>
+    <g:requires name="scripts/doctype/CustomEventManager.js"></g:requires>
+    <g:requires name="scripts/classes/ajax/GlideAjax.js"></g:requires>
+    <g:requires name="scripts/classes/GlideUser.js"></g:requires>
+    <g2:client_script type="user"></g2:client_script>
+    <link rel="preload" href="/uxasset/set-cache-buster/$[UxFrameworkScriptables.getFlushTimestamp()].js" as="script"></link>
+    <link data-source-id="glide-theme" rel="stylesheet" href="/$uxappimmutables.do?sysparm_request_type=ux_theme$[AMP]sysparm_app_sys_id=c86a62e2c7022010099a308dc7c26022$[AMP]uxpcb=$[UxFrameworkScriptables.getFlushTimestamp()]"></link>
+    <script type="module" src="/uxasset/externals/@devsnc/library-uxf/index.jsdbx"></script>
+    <!-- @sdk:now-ux-globals -->
+    <!-- Include your React entry point -->
+    <script src="/uxasset/externals/x_1118332_incident/main.jsdbx" type="module"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>]]></html>
+    <name>debrief_assistant</name>
+    <processing_script/>
+  </sys_ui_page>
+<sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="Incident Deb">41d6f38453913210030191e0a0490ea0</application>
+        <file_path/>
+        <instance_id>9e4b0b66dbf5f55002d91729139619e1</instance_id>
+        <instance_name>dev184503</instance_name>
+        <name>sys_ui_page_67b12fc203e546db852d05ef6bf9723f</name>
+        <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update&gt;
+  &lt;sys_ui_page action="INSERT_OR_UPDATE"&gt;
+    &lt;sys_id&gt;67b12fc203e546db852d05ef6bf9723f&lt;/sys_id&gt;
+    &lt;sys_scope display_value="x_1118332_incident"&gt;41d6f38453913210030191e0a0490ea0&lt;/sys_scope&gt;
+    &lt;category&gt;general&lt;/category&gt;
+    &lt;client_script/&gt;
+    &lt;description&gt;React-based UI for incident analysis and debrief with server-side processing&lt;/description&gt;
+    &lt;direct&gt;true&lt;/direct&gt;
+    &lt;endpoint&gt;x_1118332_incident_debrief_assistant.do&lt;/endpoint&gt;
+    &lt;html&gt;&lt;![CDATA[
+&lt;!-- @fluent-import-html WARNING: This file was imported from the output of a static build. Modifications of any kind are likely to result in unintended behavior. In most cases, you should edit the source file of the HTML imported below. If you are absolutely certain you want to take control of this HTML, you can remove this comment to prevent the SDK from regenerating it. However, you will then be responsible for the management of this HTML in your Fluent file. --&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Incident Debrief Assistant&lt;/title&gt;
+    &lt;!-- Initialize globals and Include ServiceNow's required scripts --&gt;
+    &lt;!-- @sdk:now-ux-globals --&gt;
+    &lt;!-- Resolved from sdk:now-ux-globals tag at NowSDK build time to support earlier Glide releases --&gt;
+    &lt;script&gt;window.NOW = {};
+window.NOW.user = {};
+window.NOW.batch_glide_ajax_requests = false;
+window.g_ck = "$[gs.getSession().getSessionToken()]";&lt;/script&gt;
+    &lt;!-- Include ServiceNow's required scripts --&gt;
+    &lt;g:requires name="scripts/doctype/functions_bootstrap14.js"&gt;&lt;/g:requires&gt;
+    &lt;g:requires name="scripts/lib/prototype.js"&gt;&lt;/g:requires&gt;
+    &lt;g:requires name="scripts/classes/ajax/GlideURL.js"&gt;&lt;/g:requires&gt;
+    &lt;g:requires name="scripts/doctype/CustomEventManager.js"&gt;&lt;/g:requires&gt;
+    &lt;g:requires name="scripts/classes/ajax/GlideAjax.js"&gt;&lt;/g:requires&gt;
+    &lt;g:requires name="scripts/classes/GlideUser.js"&gt;&lt;/g:requires&gt;
+    &lt;g2:client_script type="user"&gt;&lt;/g2:client_script&gt;
+    &lt;link rel="preload" href="/uxasset/set-cache-buster/$[UxFrameworkScriptables.getFlushTimestamp()].js" as="script"&gt;&lt;/link&gt;
+    &lt;link data-source-id="glide-theme" rel="stylesheet" href="/$uxappimmutables.do?sysparm_request_type=ux_theme$[AMP]sysparm_app_sys_id=c86a62e2c7022010099a308dc7c26022$[AMP]uxpcb=$[UxFrameworkScriptables.getFlushTimestamp()]"&gt;&lt;/link&gt;
+    &lt;script type="module" src="/uxasset/externals/@devsnc/library-uxf/index.jsdbx"&gt;&lt;/script&gt;
+    &lt;!-- @sdk:now-ux-globals --&gt;
+    &lt;!-- Include your React entry point --&gt;
+    &lt;script src="/uxasset/externals/x_1118332_incident/main.jsdbx" type="module"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id="root"&gt;&lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;]]&gt;&lt;/html&gt;
+    &lt;name&gt;debrief_assistant&lt;/name&gt;
+    &lt;processing_script/&gt;
+  &lt;/sys_ui_page&gt;
+&lt;/record_update&gt;</payload>
+        <payload_hash>111033887</payload_hash>
+        <record_name>debrief_assistant</record_name>
+        <reverted_from/>
+        <source>478d44285315b210030191e0a0490e7e</source>
+        <source_table>sys_upgrade_history</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-15 10:35:47</sys_created_on>
+        <sys_id>5b8d44285315b210030191e0a0490eaa</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>19a8715d9530000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-15 10:35:47</sys_updated_on>
+        <type>UI Page</type>
+        <update_guid>1b8d44281515b21098d853fe45dda7aa</update_guid>
+        <update_guid_history>1b8d44281515b21098d853fe45dda7aa:111033887</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete/>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-15 11:53:18</sys_created_on>
+        <sys_db_object display_value="" name="sys_ui_page">sys_ui_page</sys_db_object>
+        <sys_id>17a66ff1fcf1483a9282114e843c5e44</sys_id>
+        <sys_metadata>67b12fc203e546db852d05ef6bf9723f</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>debrief_assistant</sys_name>
+        <sys_package display_value="Incident Deb" source="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="Incident Deb">41d6f38453913210030191e0a0490ea0</sys_scope>
+        <sys_scope_delete display_value="">04f587f805d34ba283454efa99b274d1</sys_scope_delete>
+        <sys_update_name>sys_ui_page_67b12fc203e546db852d05ef6bf9723f</sys_update_name>
+        <sys_update_version display_value="sys_ui_page_67b12fc203e546db852d05ef6bf9723f">5b8d44285315b210030191e0a0490eaa</sys_update_version>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-15 11:53:18</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>

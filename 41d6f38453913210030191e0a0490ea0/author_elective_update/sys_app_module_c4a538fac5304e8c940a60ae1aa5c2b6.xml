@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="DELETE">
+        <active>true</active>
+        <application/>
+        <assessment/>
+        <device_type/>
+        <filter/>
+        <hint>Start a new incident analysis</hint>
+        <homepage/>
+        <image/>
+        <link_type>DIRECT</link_type>
+        <map_page/>
+        <mobile_title/>
+        <mobile_view_name/>
+        <name/>
+        <order>100</order>
+        <override_menu_roles>false</override_menu_roles>
+        <query>x_1118332_incident_debrief_assistant.do</query>
+        <report/>
+        <require_confirmation>false</require_confirmation>
+        <roles/>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-15 09:53:10</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>c4a538fac5304e8c940a60ae1aa5c2b6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>New Analysis</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Incident Deb" source="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Incident Deb">41d6f38453913210030191e0a0490ea0</sys_scope>
+        <sys_update_name>sys_app_module_c4a538fac5304e8c940a60ae1aa5c2b6</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-15 09:53:10</sys_updated_on>
+        <timeline_page/>
+        <title>New Analysis</title>
+        <uncancelable>false</uncancelable>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="Incident Deb">41d6f38453913210030191e0a0490ea0</application>
+        <file_path/>
+        <instance_id>9e4b0b66dbf5f55002d91729139619e1</instance_id>
+        <instance_name>dev184503</instance_name>
+        <name>sys_app_module_c4a538fac5304e8c940a60ae1aa5c2b6</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module"><sys_app_module action="INSERT_OR_UPDATE"><active>true</active><application/><assessment/><device_type/><filter/><hint>Start a new incident analysis</hint><homepage/><image/><link_type>DIRECT</link_type><map_page/><mobile_title/><mobile_view_name/><name/><order>100</order><override_menu_roles>false</override_menu_roles><query>x_1118332_incident_debrief_assistant.do</query><report/><require_confirmation>false</require_confirmation><roles/><sys_class_name>sys_app_module</sys_class_name><sys_created_by>admin</sys_created_by><sys_created_on>2025-11-15 09:53:10</sys_created_on><sys_domain>global</sys_domain><sys_domain_path>/</sys_domain_path><sys_id>c4a538fac5304e8c940a60ae1aa5c2b6</sys_id><sys_mod_count>0</sys_mod_count><sys_name>New Analysis</sys_name><sys_overrides/><sys_package display_value="Incident Deb" source="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_package><sys_policy/><sys_scope display_value="Incident Deb">41d6f38453913210030191e0a0490ea0</sys_scope><sys_update_name>sys_app_module_c4a538fac5304e8c940a60ae1aa5c2b6</sys_update_name><sys_updated_by>admin</sys_updated_by><sys_updated_on>2025-11-15 09:53:10</sys_updated_on><timeline_page/><title>New Analysis</title><uncancelable>false</uncancelable><view_name/><window_name/></sys_app_module></record_update>]]></payload>
+        <payload_hash>51378993</payload_hash>
+        <record_name>New Analysis</record_name>
+        <reverted_from/>
+        <source>990ab05853993210030191e0a0490e09</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-15 11:43:47</sys_created_on>
+        <sys_id>db1d1ce85395b210030191e0a0490eda</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>19a87541b6e0000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-15 11:43:47</sys_updated_on>
+        <type>Module</type>
+        <update_guid>171d1ce8b595b210de3f101cfd018fda</update_guid>
+        <update_guid_history>171d1ce8b595b210de3f101cfd018fda:0,3ac34024edd1b210e6bd8cd97913c2da:-2124517549</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete display_value="New Analysis">c11f182053d5b210030191e0a0490e57</sys_audit_delete>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-15 11:52:22</sys_created_on>
+        <sys_db_object display_value="" name="sys_app_module">sys_app_module</sys_db_object>
+        <sys_id>7b38ee9240f848bd82eab96632d6c3a9</sys_id>
+        <sys_metadata>c4a538fac5304e8c940a60ae1aa5c2b6</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>New Analysis</sys_name>
+        <sys_package display_value="Incident Deb" source="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="Incident Deb">41d6f38453913210030191e0a0490ea0</sys_scope>
+        <sys_scope_delete display_value="">04f587f805d34ba283454efa99b274d1</sys_scope_delete>
+        <sys_update_name>sys_app_module_c4a538fac5304e8c940a60ae1aa5c2b6</sys_update_name>
+        <sys_update_version display_value="sys_app_module_c4a538fac5304e8c940a60ae1aa5c2b6">db1d1ce85395b210030191e0a0490eda</sys_update_version>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-15 11:52:22</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>

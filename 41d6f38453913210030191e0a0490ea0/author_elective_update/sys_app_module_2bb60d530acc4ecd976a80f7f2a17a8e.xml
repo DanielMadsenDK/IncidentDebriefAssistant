@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+  <sys_app_module action="DELETE">
+    <sys_id>2bb60d530acc4ecd976a80f7f2a17a8e</sys_id>
+    <sys_scope display_value="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_scope>
+    <active>true</active>
+    <application>5eec69dc1c7e4d1389c1119c793e323a</application>
+    <link_type>SEPARATOR</link_type>
+    <order>200</order>
+    <title>Analysis Tools</title>
+  </sys_app_module>
+<sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="Incident Deb">41d6f38453913210030191e0a0490ea0</application>
+        <file_path/>
+        <instance_id>9e4b0b66dbf5f55002d91729139619e1</instance_id>
+        <instance_name>dev184503</instance_name>
+        <name>sys_app_module_2bb60d530acc4ecd976a80f7f2a17a8e</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update>
+  <sys_app_module action="INSERT_OR_UPDATE">
+    <sys_id>2bb60d530acc4ecd976a80f7f2a17a8e</sys_id>
+    <sys_scope display_value="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_scope>
+    <active>true</active>
+    <application>5eec69dc1c7e4d1389c1119c793e323a</application>
+    <link_type>SEPARATOR</link_type>
+    <order>200</order>
+    <title>Analysis Tools</title>
+  </sys_app_module>
+</record_update>]]></payload>
+        <payload_hash>2059112942</payload_hash>
+        <record_name>Analysis Tools</record_name>
+        <reverted_from/>
+        <source>b0f61c6c5355b210030191e0a0490eab</source>
+        <source_table>sys_upgrade_history</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-15 11:16:51</sys_created_on>
+        <sys_id>f4f61c6c5355b210030191e0a0490ead</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>19a873b71110000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-15 11:16:51</sys_updated_on>
+        <type>Module</type>
+        <update_guid>b4f61c6ce555b210e08280d4253480ad</update_guid>
+        <update_guid_history>b4f61c6ce555b210e08280d4253480ad:2059112942</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete display_value="Analysis Tools">2a6d182c5395b210030191e0a0490e75</sys_audit_delete>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-15 11:45:05</sys_created_on>
+        <sys_db_object display_value="" name="sys_app_module">sys_app_module</sys_db_object>
+        <sys_id>2774fe1a2ac34e74950234c49551c099</sys_id>
+        <sys_metadata>2bb60d530acc4ecd976a80f7f2a17a8e</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Analysis Tools</sys_name>
+        <sys_package display_value="Incident Deb" source="x_1118332_incident">41d6f38453913210030191e0a0490ea0</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="Incident Deb">41d6f38453913210030191e0a0490ea0</sys_scope>
+        <sys_scope_delete display_value="">04f587f805d34ba283454efa99b274d1</sys_scope_delete>
+        <sys_update_name>sys_app_module_2bb60d530acc4ecd976a80f7f2a17a8e</sys_update_name>
+        <sys_update_version display_value="sys_app_module_2bb60d530acc4ecd976a80f7f2a17a8e">f4f61c6c5355b210030191e0a0490ead</sys_update_version>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-15 11:45:05</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>
