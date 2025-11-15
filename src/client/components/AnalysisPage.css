@@ -1200,9 +1200,68 @@
     font-size: 0.88rem;
   }
 
-  .metric-value {
-    font-size: 1.6rem;
-  }
+.metric-value {
+  font-size: 1.6rem;
+}
+
+/* ===================================
+   CI HEALTH HISTORY CARD STYLES
+   =================================== */
+
+/* CI Health Grid Layout */
+.ci-health-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* CI Health Score Badge */
+.ci-health-score-badge {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white !important;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+
+/* Status-aware health score badge colors */
+.metric-status-unknown .ci-health-score-badge {
+  background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+  box-shadow: 0 4px 12px rgba(160, 174, 192, 0.3);
+}
+.metric-status-resolved .ci-health-score-badge {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+.metric-status-active .ci-health-score-badge {
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+  box-shadow: 0 4px 12px rgba(237, 137, 54, 0.3);
+}
+
+/* Risk status coloring for metric items */
+.metric-item:has([value*="HIGH"]),
+.metric-item:has([value*="CRITICAL"]) {
+  border-color: hsl(0, 100%, 67%);
+  background: linear-gradient(135deg, rgba(245, 101, 101, 0.1) 0%, rgba(197, 48, 48, 0.1) 100%);
+}
+
+.metric-item:has([value*="MEDIUM"]),
+.metric-item:has([value*="MODERATE"]) {
+  border-color: hsl(38, 92%, 50%);
+  background: linear-gradient(135deg, rgba(237, 137, 54, 0.1) 0%, rgba(221, 107, 32, 0.1) 100%);
+}
+
+.metric-item:has([value*="LOW"]),
+.metric-item:has([value*="EXCELLENT"]) {
+  border-color: hsl(160, 84%, 39%);
+  background: linear-gradient(135deg, rgba(72, 187, 120, 0.1) 0%, rgba(56, 161, 105, 0.1) 100%);
+}
 }
 
 /* ===================================

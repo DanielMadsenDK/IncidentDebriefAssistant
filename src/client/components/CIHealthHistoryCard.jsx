@@ -248,200 +248,94 @@ export default function CIHealthHistoryCard({ incident, onLoad }) {
   };
 
   return (
-    <div className="debrief-card ci-health-premium">
-      {/* Premium Header Banner */}
-      <div className="ci-health-header-banner">
-        <div className="ci-health-header-overlay">
-          <div className="ci-health-header-content">
-            <div className="ci-health-header-primary">
-              <span className="ci-health-icon-pulse">💻</span>
-              <div className="ci-health-header-titles">
-                <h2 className="ci-health-main-title">Configuration Item Health Analysis</h2>
-                <p className="ci-health-subtitle">{healthData.ci_info.name || 'Unknown Configuration Item'}</p>
-              </div>
-            </div>
-            <HealthScoreGauge score={healthData.stress_indicators?.health_score || 0} />
-          </div>
-
-          {/* Time Window Indicator */}
-          <div className="ci-health-timeline-indicator">
-            <div className="timeline-window-badge">
-              <span className="window-icon">⏰</span>
-              <span className="window-text">
-                {healthData.health_analysis.time_window.pre_incident_hours}hr analysis window
-              </span>
-            </div>
-            <div className="incident-marker">
-              <span className="marker-dot"></span>
-              <span className="marker-label">Incident at {new Date(healthData.health_analysis.time_window.incident_opened_at * 1000).toLocaleString()}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Animated gradient border */}
-        <div className="ci-health-header-glow"></div>
+    <div className="debrief-card">
+      <div className="card-header">
+        <h2 className="card-title">
+          💻 CI Health Analysis
+          <span className="ci-health-score-badge" style={{
+            backgroundColor: getHealthScoreColor(healthData.stress_indicators?.health_score || 0),
+            color: 'white',
+            padding: '0.25rem 0.75rem',
+            borderRadius: '12px',
+            fontSize: '0.8rem',
+            fontWeight: '700',
+            marginLeft: '12px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.25rem'
+          }}>
+            <span>{healthData.stress_indicators?.health_score || 0}</span>
+          </span>
+        </h2>
       </div>
-
-      {/* Main Dashboard Content */}
-      <div className="ci-health-content-wrapper">
-        {/* CI Details Ribbon */}
-        <div className="ci-details-ribbon">
-          <div className="ci-detail-item">
-            <span className="ci-detail-icon">🏷️</span>
-            <span className="ci-detail-label">Class:</span>
-            <span className="ci-detail-value">{healthData.ci_info.class || 'Unknown'}</span>
-          </div>
-          <div className="ci-detail-item">
-            <span className="ci-detail-icon">⚡</span>
-            <span className="ci-detail-label">Status:</span>
-            <span className={`ci-detail-value status-${healthData.ci_info.operational_status?.toLowerCase()}`}>
-              {healthData.ci_info.operational_status || 'Unknown'}
-            </span>
-          </div>
-          <div className="ci-detail-item">
-            <span className="ci-detail-icon">🔄</span>
-            <span className="ci-detail-label">Install Status:</span>
-            <span className="ci-detail-value status-installed">
-              {healthData.ci_info.install_status || 'Unknown'}
-            </span>
-          </div>
-        </div>
-
-        {/* Risk Assessment Panel */}
-        <div className="ci-risk-assessment-panel">
-          <h3 className="risk-panel-title">
-            <span className="risk-panel-icon">🎯</span>
-            Risk Assessment Dashboard
-          </h3>
-
-          <div className="risk-indicators-grid">
-            <RiskIndicatorCard
-              title="Overload Indicator"
-              value={healthData.stress_indicators?.overload_indicator?.toUpperCase() || 'UNKNOWN'}
-              color={getStressLevelColor(healthData.stress_indicators?.overload_indicator)}
-              icon="📊"
-              description="Current incident concurrency level"
-            />
-            <RiskIndicatorCard
-              title="Stability Risk"
-              value={healthData.stress_indicators?.stability_risk?.toUpperCase() || 'UNKNOWN'}
-              color={getStressLevelColor(healthData.stress_indicators?.stability_risk)}
-              icon="⚖️"
-              description="Change activity and SLA pressure"
-            />
-          </div>
-
-          {/* Correlation Score */}
-          <div className="correlation-score-display">
-            <div className="correlation-header">
-              <span className="correlation-icon">🔗</span>
-              <span className="correlation-title">Activity Correlation Score</span>
+      <div className="card-content">
+        <div className="ci-health-grid">
+          {/* CI Configuration Details */}
+          <div className="overview-grid">
+            <div className="overview-item">
+              <span className="overview-label">Configuration Item</span>
+              <p className="overview-value">{healthData.ci_info.name || 'Unknown Configuration Item'}</p>
             </div>
-            <CorrelationMeter score={healthData.correlation_score || 0} />
-            <p className="correlation-description">
-              Weighted score based on incident frequency, changes, and SLA breaches during analysis window
-            </p>
+            <div className="overview-item">
+              <span className="overview-label">Analysis Window</span>
+              <p className="overview-value">{healthData.health_analysis.time_window.pre_incident_hours} hours pre-incident</p>
+            </div>
           </div>
-        </div>
 
-        {/* Activity Analysis Section */}
-        <div className="ci-activity-analysis-section">
-          <h3 className="activity-section-title">
-            <span className="activity-section-icon">📈</span>
-            Activity Correlation Analysis
-          </h3>
-
-          <div className="activity-metrics-dashboard">
-            <ActivityMetricCard
+          {/* Key Health Metrics */}
+          <div className="metrics-grid">
+            <MetricItem
+              icon="📊"
+              label="Overload Risk"
+              value={healthData.stress_indicators?.overload_indicator?.toUpperCase() || 'UNKNOWN'}
+              status={healthData.stress_indicators?.overload_indicator?.toLowerCase() || 'unknown'}
+            />
+            <MetricItem
+              icon="⚖️"
+              label="Stability Risk"
+              value={healthData.stress_indicators?.stability_risk?.toUpperCase() || 'UNKNOWN'}
+              status={healthData.stress_indicators?.stability_risk?.toLowerCase() || 'unknown'}
+            />
+            <MetricItem
+              icon="🔗"
+              label="Correlation Score"
+              value={`${healthData.correlation_score || 0}/20`}
+              subtitle="Activity correlation level"
+            />
+            <MetricItem
+              icon="⚡"
+              label="CI Class"
+              value={healthData.ci_info.class || 'Unknown'}
+              subtitle="Configuration item type"
+            />
+            <MetricItem
               icon="🚨"
               label="Concurrent Incidents"
               value={healthData.related_activity?.pre_incident_incidents?.length || 0}
-              color="#f56565"
-              trend="incidents affecting same CI"
+              subtitle="Affecting same CI"
             />
-            <ActivityMetricCard
+            <MetricItem
               icon="🔧"
               label="Change Requests"
               value={healthData.related_activity?.related_change_requests?.length || 0}
-              color="#ed8936"
-              trend="changes during window"
-            />
-            <ActivityMetricCard
-              icon="⏱️"
-              label="SLA Breaches"
-              value={healthData.related_activity?.sla_events?.filter(s => s.breached).length || 0}
-              color="#dc3545"
-              trend="service level violations"
+              subtitle="During analysis window"
             />
           </div>
-        </div>
 
-        {/* Insights Panel */}
-        {healthData.stress_indicators?.correlation_insights?.length > 0 && (
-          <div className="ci-insights-panel">
-            <h3 className="insights-panel-title">
-              <span className="insights-panel-icon">💡</span>
-              AI-Generated Insights
-            </h3>
-
-            <div className="insights-list">
-              {healthData.stress_indicators.correlation_insights.map((insight, index) => (
-                <div key={index} className="insight-card">
-                  <div className="insight-icon">🎯</div>
-                  <div className="insight-content">
-                    <p className="insight-text">{insight}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Incident Details Gallery */}
-        {healthData.related_activity?.pre_incident_incidents?.length > 0 && (
-          <div className="incident-gallery-section">
-            <h3 className="gallery-section-title">
-              <span className="gallery-section-icon">📋</span>
-              Related Incidents Gallery
-              <span className="gallery-count">({healthData.related_activity.pre_incident_incidents.length})</span>
-            </h3>
-
-            <div className="incident-cards-grid">
-              {healthData.related_activity.pre_incident_incidents.slice(0, 6).map((inc, idx) => (
-                <div key={idx} className="incident-card">
-                  <div className="incident-card-header">
-                    <span className="incident-card-number">{inc.number}</span>
-                    <span className={`incident-card-priority priority-${inc.priority}`}>
-                      P{inc.priority}
-                    </span>
-                  </div>
-                  <div className="incident-card-state">
-                    <span className={`state-badge state-${inc.state?.toLowerCase()?.replace(/\s+/g, '-')}`}>
-                      {inc.state}
-                    </span>
-                  </div>
-                  <div className="incident-card-description">
-                    <p>{inc.short_description?.substring(0, 80) || 'No description available'}</p>
-                  </div>
-                  <div className="incident-card-meta">
-                    <span className="incident-card-time">
-                      {new Date(inc.opened_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {healthData.related_activity.pre_incident_incidents.length > 6 && (
-              <div className="gallery-show-more">
-                <span className="show-more-icon">📚</span>
-                <span className="show-more-text">
-                  View all {healthData.related_activity.pre_incident_incidents.length} incidents...
-                </span>
+          {/* AI Insights */}
+          {healthData.stress_indicators?.correlation_insights?.length > 0 && (
+            <div className="actions-grid">
+              <div className="action-section">
+                <h4 className="section-title">💡 Key Health Insights</h4>
+                <ul className="action-list">
+                  {healthData.stress_indicators.correlation_insights.slice(0, 3).map((insight, index) => (
+                    <li key={index} className="action-item">🎯 {insight}</li>
+                  ))}
+                </ul>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
