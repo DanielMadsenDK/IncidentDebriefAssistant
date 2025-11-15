@@ -163,58 +163,6 @@ export default function LandingPage({ onNavigateToAnalysis }) {
         </div>
       </div>
 
-      {/* How It Works Section */}
-      <div className="features-section">
-        <div className="features-container">
-          <h2 className="section-title">How It Works</h2>
-          <p className="section-description">
-            Our deterministic analysis engine processes every incident through multiple layers of intelligent insights, delivering comprehensive debriefs that drive operational excellence.
-          </p>
-
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon">
-                <div className="icon-bg">📊</div>
-              </div>
-              <div className="feature-content">
-                <h3>Timeline Reconstruction</h3>
-                <p>Complete chronological analysis of all incident events, field changes, and communication patterns across the entire lifecycle.</p>
-              </div>
-            </div>
-
-            <div className="feature-card">
-              <div className="feature-icon">
-                <div className="icon-bg">📈</div>
-              </div>
-              <div className="feature-content">
-                <h3>Debrief Metrics</h3>
-                <p>Advanced performance metrics including resolution time, assignment changes, communication volume, and SLA compliance tracking.</p>
-              </div>
-            </div>
-
-            <div className="feature-card">
-              <div className="feature-icon">
-                <div className="icon-bg">🔍</div>
-              </div>
-              <div className="feature-content">
-                <h3>Root Cause Detection</h3>
-                <p>Intelligent pattern recognition and automated root cause analysis based on historical data, journal entries, and field change history.</p>
-              </div>
-            </div>
-
-            <div className="feature-card">
-              <div className="feature-icon">
-                <div className="icon-bg">💡</div>
-              </div>
-              <div className="feature-content">
-                <h3>Actionable Insights</h3>
-                <p>Data-driven recommendations for process improvement, prevention measures, and operational excellence initiatives.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Search Section */}
       <div className="search-section">
         <div className="search-container">
@@ -326,6 +274,58 @@ export default function LandingPage({ onNavigateToAnalysis }) {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* How It Works Section */}
+      <div className="features-section">
+        <div className="features-container">
+          <h2 className="section-title">How It Works</h2>
+          <p className="section-description">
+            Our deterministic analysis engine processes every incident through multiple layers of intelligent insights, delivering comprehensive debriefs that drive operational excellence.
+          </p>
+
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <div className="icon-bg">📊</div>
+              </div>
+              <div className="feature-content">
+                <h3>Timeline Reconstruction</h3>
+                <p>Complete chronological analysis of all incident events, field changes, and communication patterns across the entire lifecycle.</p>
+              </div>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <div className="icon-bg">📈</div>
+              </div>
+              <div className="feature-content">
+                <h3>Debrief Metrics</h3>
+                <p>Advanced performance metrics including resolution time, assignment changes, communication volume, and SLA compliance tracking.</p>
+              </div>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <div className="icon-bg">🔍</div>
+              </div>
+              <div className="feature-content">
+                <h3>Root Cause Detection</h3>
+                <p>Intelligent pattern recognition and automated root cause analysis based on historical data, journal entries, and field change history.</p>
+              </div>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <div className="icon-bg">💡</div>
+              </div>
+              <div className="feature-content">
+                <h3>Actionable Insights</h3>
+                <p>Data-driven recommendations for process improvement, prevention measures, and operational excellence initiatives.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
