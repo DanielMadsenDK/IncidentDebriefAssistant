@@ -309,61 +309,59 @@ function HorizontalTimeline({ timelineData }) {
 
   return (
     <div className="horizontal-timeline-container">
-      <div className="horizontal-timeline-wrapper">
-        {/* Timeline scrollable area */}
-        <div className="horizontal-timeline-scroll">
-          <div className="horizontal-timeline-events-container">
-            {timelineItems.map((item) => (
-              <div key={item.id} className="horizontal-timeline-item">
-                {/* Timeline point */}
-                <div className="horizontal-timeline-point">
-                  <div className="horizontal-timeline-dot">
-                    <span className="horizontal-timeline-icon">{item.icon}</span>
-                  </div>
+      {/* Scrollable timeline viewport */}
+      <div className="horizontal-timeline-viewport">
+        <div className="horizontal-timeline-events-container">
+          {timelineItems.map((item) => (
+            <div key={item.id} className="horizontal-timeline-item">
+              {/* Timeline point */}
+              <div className="horizontal-timeline-point">
+                <div className="horizontal-timeline-dot">
+                  <span className="horizontal-timeline-icon">{item.icon}</span>
                 </div>
+              </div>
 
-                {/* Event card */}
-                <div className="horizontal-timeline-card">
+              {/* Event card */}
+              <div className="horizontal-timeline-card">
+                <div
+                  className="horizontal-event-card"
+                  onClick={() => toggleExpand(item.id)}
+                >
+                  <div className="horizontal-event-header">
+                    <span className="horizontal-event-icon">{item.icon}</span>
+                    <h3 className="horizontal-event-title">{item.title}</h3>
+                  </div>
+                  <p className="horizontal-event-subtitle">{item.subtitle}</p>
+                  <p className="horizontal-event-duration">{item.duration}</p>
+                  <p className="horizontal-event-description">{item.description}</p>
+
+                  {/* Expandable achievements */}
                   <div
-                    className="horizontal-event-card"
-                    onClick={() => toggleExpand(item.id)}
+                    className="horizontal-event-achievements"
+                    style={{
+                      maxHeight: expandedId === item.id ? '500px' : '0',
+                      opacity: expandedId === item.id ? 1 : 0,
+                      transition: 'all 0.3s ease'
+                    }}
                   >
-                    <div className="horizontal-event-header">
-                      <span className="horizontal-event-icon">{item.icon}</span>
-                      <h3 className="horizontal-event-title">{item.title}</h3>
-                    </div>
-                    <p className="horizontal-event-subtitle">{item.subtitle}</p>
-                    <p className="horizontal-event-duration">{item.duration}</p>
-                    <p className="horizontal-event-description">{item.description}</p>
-
-                    {/* Expandable achievements */}
-                    <div
-                      className="horizontal-event-achievements"
-                      style={{
-                        maxHeight: expandedId === item.id ? '500px' : '0',
-                        opacity: expandedId === item.id ? 1 : 0,
-                        transition: 'all 0.3s ease'
-                      }}
-                    >
-                      {item.achievements && item.achievements.length > 0 && (
-                        <div className="horizontal-achievements-list">
-                          <h4 className="horizontal-achievements-title">Full Content:</h4>
-                          {item.achievements.map((achievement, i) => (
-                            <p key={i} className="horizontal-achievement-item">{achievement}</p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    {item.achievements && item.achievements.length > 0 && (
+                      <div className="horizontal-achievements-list">
+                        <h4 className="horizontal-achievements-title">Full Content:</h4>
+                        {item.achievements.map((achievement, i) => (
+                          <p key={i} className="horizontal-achievement-item">{achievement}</p>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-
-        {/* Fixed timeline bar */}
-        <div className="horizontal-timeline-bar-fixed"></div>
       </div>
+
+      {/* Timeline bar connector */}
+      <div className="horizontal-timeline-bar"></div>
     </div>
   );
 }
