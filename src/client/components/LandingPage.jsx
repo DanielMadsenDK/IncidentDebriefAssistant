@@ -1,51 +1,150 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import IncidentSearchService from '../services/IncidentSearchService';
 import './LandingPage.css';
 
+// Custom debounce function to replace lodash.debounce
+const debounce = (func, delay) => {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(null, args), delay);
+  };
+};
+
+// IconBackground component using CSS instead of react-icons
+const IconBackground = ({ children, color }) => (
+  <div className={`result-icon-bg ${color}`}>
+    {children}
+  </div>
+);
+
 export default function LandingPage({ onNavigateToAnalysis }) {
   const [selectedIncident, setSelectedIncident] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [isOpen, setIsOpen] = useState(false);
+  const [recentSearches, setRecentSearches] = useState([]);
+  const inputRef = useRef(null);
+  const resultsRef = useRef(null);
   const [isSearching, setIsSearching] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [error, setError] = useState(null);
   const [searchService] = useState(() => new IncidentSearchService());
 
-  // Search for incidents when search term changes
-  useEffect(() => {
-    // If the input still reflects the currently selected incident, don't re-search
-    if (selectedIncident && searchTerm.startsWith(selectedIncident.number)) {
-      setShowDropdown(false);
-      setSearchResults([]);
-      return;
-    }
+  // Function to get icon by incident priority/state
+  const getIconByIncidentType = (incident) => {
+    const priority = parseInt(incident.priority) || 4;
+    const state = incident.state;
 
-    if (searchTerm.length > 2) {
+    // Use priority for color coding (lower number = higher priority)
+    if (priority === 1) {
+      return (
+        <IconBackground color="icon-bg-critical">
+          ⚠️
+        </IconBackground>
+      );
+    } else if (priority === 2) {
+      return (
+        <IconBackground color="icon-bg-high">
+          🚨
+        </IconBackground>
+      );
+    } else if (state === '6' || state === '7') { // Resolved or Closed
+      return (
+        <IconBackground color="icon-bg-resolved">
+          ✅
+        </IconBackground>
+      );
+    } else if (state === '2') { // In Progress
+      return (
+        <IconBackground color="icon-bg-progress">
+          🔄
+        </IconBackground>
+      );
+    } else { // New or other states
+      return (
+        <IconBackground color="icon-bg-new">
+          📋
+        </IconBackground>
+      );
+    }
+  };
+
+  const searchIncidents = useCallback(
+    debounce((searchQuery) => {
+      if (!searchQuery.trim()) {
+        setResults([]);
+        return;
+      }
+
       setIsSearching(true);
       setError(null);
-      
-      searchService.searchIncidents(searchTerm)
-        .then(results => {
-          console.log('Search results:', results); // Debug log
-          const safeResults = results || [];
-          setSearchResults(safeResults);
+
+      searchService.searchIncidents(searchQuery)
+        .then(incidents => {
+          console.log('Search results:', incidents);
+          const safeResults = incidents || [];
+          // Limit to first 7 results like the template
+          setResults(safeResults.slice(0, 7));
           setIsSearching(false);
-          // Only show dropdown when there are results to choose from
-          setShowDropdown(safeResults.length > 0);
         })
         .catch(error => {
           console.error('Search error:', error);
           setError('Search failed: ' + error.message);
+          setResults([]);
           setIsSearching(false);
-          setSearchResults([]);
-          setShowDropdown(false);
         });
+    }, 300),
+    [searchService]
+  );
+
+  useEffect(() => {
+    // If the input still reflects the currently selected incident, don't re-search
+    if (selectedIncident && query.startsWith(selectedIncident.number)) {
+      setIsOpen(false);
+      setResults([]);
+      return;
+    }
+
+    if (query.length > 2) {
+      searchIncidents(query);
+      setIsOpen(true);
     } else {
-      setSearchResults([]);
-      setShowDropdown(false);
+      setResults([]);
+      setIsOpen(false);
       setError(null);
     }
-  }, [searchTerm, searchService, selectedIncident]);
+  }, [query, searchIncidents, selectedIncident]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev < results.length - 1 ? prev + 1 : prev));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === "Enter" && selectedIndex >= 0) {
+      const selected = results[selectedIndex];
+      handleResultClick(selected);
+    }
+  };
+
+  const handleResultClick = (incident) => {
+    setSelectedIncident(incident);
+    setQuery(`${incident.number} - ${incident.short_description}`);
+    setResults([]);
+    setIsOpen(false);
+    setRecentSearches(prev => [incident, ...prev.slice(0, 4)]);
+    setSelectedIndex(-1);
+    setError(null);
+  };
+
+  const handleClear = () => {
+    setQuery("");
+    setResults([]);
+    setIsOpen(false);
+    inputRef.current?.focus();
+  };
 
   const handleAnalyze = () => {
     if (selectedIncident) {
@@ -56,48 +155,6 @@ export default function LandingPage({ onNavigateToAnalysis }) {
         // Fallback to the parent component's navigation
         onNavigateToAnalysis(selectedIncident.sys_id);
       }
-    }
-  };
-
-  const handleIncidentSelect = (incident) => {
-    try {
-      setSelectedIncident(incident);
-      setSearchTerm(incident.number + ' - ' + incident.short_description);
-      // Clear results and hide panel so the button remains visible
-      setSearchResults([]);
-      setShowDropdown(false);
-      setError(null);
-    } catch (error) {
-      console.error('Error selecting incident:', error);
-      setError('Failed to select incident');
-    }
-  };
-
-  const handleInputChange = (e) => {
-    try {
-      setSearchTerm(e.target.value);
-      setError(null);
-    } catch (error) {
-      console.error('Error updating search term:', error);
-    }
-  };
-
-  const handleInputFocus = () => {
-    try {
-      if (searchResults.length > 0) {
-        setShowDropdown(true);
-      }
-    } catch (error) {
-      console.error('Error on input focus:', error);
-    }
-  };
-
-  const handleInputBlur = () => {
-    try {
-      // Delay hiding to allow click on dropdown items
-      setTimeout(() => setShowDropdown(false), 150);
-    } catch (error) {
-      console.error('Error on input blur:', error);
     }
   };
 
@@ -165,41 +222,60 @@ export default function LandingPage({ onNavigateToAnalysis }) {
             <div className="search-input-container">
               <div className="search-icon">🔍</div>
               <input
+                ref={inputRef}
                 type="text"
-                className="search-input"
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setSelectedIndex(-1);
+                  setError(null);
+                }}
+                onKeyDown={handleKeyDown}
                 placeholder="Search incidents by number, description, or keywords..."
-                value={searchTerm}
-                onChange={handleInputChange}
-                onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
+                className="search-input"
+                aria-label="Search input"
+                role="searchbox"
               />
+              {query && (
+                <button
+                  onClick={handleClear}
+                  className="clear-button"
+                  aria-label="Clear search"
+                >
+                  ✕
+                </button>
+              )}
               {isSearching && <div className="search-loader">⏳</div>}
             </div>
 
             {/* Search Results Panel */}
-            {showDropdown && searchResults && searchResults.length > 0 && (
-              <div className="results-panel">
-                <div className="results-header">
-                  <span className="results-count">{searchResults.length} results found</span>
-                </div>
-                <div className="results-list">
-                  {searchResults.slice(0, 8).map((incident) => {
-                    if (!incident || !incident.sys_id) return null;
-
-                    return (
+            {isOpen && (results.length > 0 || query.trim()) && (
+              <div
+                ref={resultsRef}
+                className="results-panel"
+                role="listbox"
+              >
+                {results.length > 0 ? (
+                  <div className="results-list">
+                    {results.map((incident, index) => (
                       <div
-                        key={incident.sys_id}
-                        className="result-item"
-                        onClick={() => handleIncidentSelect(incident)}
+                        key={`incident-${incident.sys_id}`}
+                        className={`result-item ${selectedIndex === index ? 'selected' : ''}`}
+                        onClick={() => handleResultClick(incident)}
+                        role="option"
+                        aria-selected={selectedIndex === index}
                       >
-                        <div className="result-primary">
-                          <span className="incident-number">{incident.number || 'Unknown'}</span>
-                          <span className="incident-description-text">
-                            {incident.short_description || 'No description available'}
-                          </span>
+                        <div className="result-icon">
+                          {getIconByIncidentType(incident)}
                         </div>
-                        <div className="result-meta">
-                          <div className="status-badges">
+                        <div className="result-content">
+                          <div className="result-title">
+                            {incident.number}
+                          </div>
+                          <div className="result-subtitle">
+                            {incident.short_description}
+                          </div>
+                          <div className="result-meta-row">
                             <span
                               className="status-badge"
                               style={{ backgroundColor: getStateColor(incident.state) }}
@@ -212,31 +288,45 @@ export default function LandingPage({ onNavigateToAnalysis }) {
                             >
                               P{incident.priority || '?'}
                             </span>
+                            {incident.assignment_group_display && (
+                              <span className="group-badge">
+                                {incident.assignment_group_display}
+                              </span>
+                            )}
                           </div>
-                          {incident.assignment_group_display && (
-                            <span className="assignment-group">
-                              <span className="group-icon">🏢</span>
-                              {incident.assignment_group_display}
-                            </span>
-                          )}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {showDropdown && searchResults && searchResults.length === 0 && !isSearching && searchTerm.length > 2 && !selectedIncident && (
-              <div className="results-panel empty-results">
-                <div className="no-results-content">
-                  <div className="no-results-icon">🔍</div>
-                  <p className="no-results-text">No incidents found matching "{searchTerm}"</p>
-                  <p className="no-results-hint">Try different keywords or check the incident number format</p>
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  !isSearching && query.trim() && (
+                    <div className="no-results-content">
+                      <div className="no-results-icon">🔍</div>
+                      <p className="no-results-text">No incidents found matching "{query}"</p>
+                      <p className="no-results-hint">Try different keywords or check the incident number format</p>
+                    </div>
+                  )
+                )}
               </div>
             )}
           </div>
+
+          {recentSearches.length > 0 && !query && (
+            <div className="recent-searches">
+              <h3 className="recent-title">Recent Searches</h3>
+              <div className="recent-list">
+                {recentSearches.map((search, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleResultClick(search)}
+                    className="recent-item"
+                  >
+                    {search.number || search.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="action-area">
             <button
