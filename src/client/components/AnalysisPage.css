@@ -969,10 +969,15 @@
 
 /* Section value styling - inline with section titles */
 .section-value {
-  font-weight: 600;
+  font-weight: 400;
   color: #1a202c;
   font-size: 0.95rem;
   word-wrap: break-word;
+}
+
+/* Add 25px margin between headline and metrics grid */
+.ci-health-grid {
+  margin-top: 25px;
 }
 
 /* Config display container - styled row for the content */
