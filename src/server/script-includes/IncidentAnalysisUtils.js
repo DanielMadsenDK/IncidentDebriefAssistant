@@ -522,7 +522,7 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
     try {
       // Get incident and validate CI association
       var incident = new GlideRecord('incident');
-      if (!incident.get(sys_id) || !incident.cmdb_ci) {
+      if (!incident.get(sys_id) || !incident.cmdb_ci || incident.cmdb_ci === '' || incident.cmdb_ci === null) {
       return JSON.stringify({
         success: false,
         error: 'Incident not found or no CI associated',
