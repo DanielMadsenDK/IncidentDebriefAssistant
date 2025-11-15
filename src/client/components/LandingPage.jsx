@@ -27,6 +27,7 @@ export default function LandingPage({ onNavigateToAnalysis }) {
   const [recentSearches, setRecentSearches] = useState([]);
   const inputRef = useRef(null);
   const resultsRef = useRef(null);
+  const searchSectionRef = useRef(null);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState(null);
   const [searchService] = useState(() => new IncidentSearchService());
@@ -115,6 +116,20 @@ export default function LandingPage({ onNavigateToAnalysis }) {
       setError(null);
     }
   }, [query, searchIncidents, selectedIncident]);
+
+  // Auto-scroll to search results when they arrive
+  useEffect(() => {
+    if (results.length > 0 && !isSearching && searchSectionRef.current) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        searchSectionRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }, 100);
+    }
+  }, [results.length, isSearching]);
 
   const handleKeyDown = (e) => {
     if (e.key === "ArrowDown") {
@@ -206,7 +221,7 @@ export default function LandingPage({ onNavigateToAnalysis }) {
       </div>
 
       {/* Search Section */}
-      <div className="search-section">
+      <div className="search-section" ref={searchSectionRef}>
         <div className="search-container">
           <h2 className="search-title">Start Investigation</h2>
           <p className="search-subtitle">Find and analyze any incident with our intelligent search engine</p>
@@ -387,7 +402,7 @@ export default function LandingPage({ onNavigateToAnalysis }) {
                 <div className="icon-bg">🔍</div>
               </div>
               <div className="feature-content">
-                <h3>Root Cause Detection</h3>
+                <h3>Analysis Summary</h3>
                 <p>Intelligent pattern recognition and automated root cause analysis based on historical data, journal entries, and field change history.</p>
               </div>
             </div>
