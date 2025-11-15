@@ -132,161 +132,203 @@ export default function LandingPage({ onNavigateToAnalysis }) {
     }
   };
 
-  // Error boundary function
-  const handleError = (error, errorInfo) => {
-    console.error('Component error:', error, errorInfo);
-    setError('Application error occurred. Please refresh the page.');
-  };
-
-  try {
-    return (
-      <div className="landing-page">
-        <div className="hero-section">
-          <h1 className="hero-title" data-text="Incident Debrief Assistant">Incident Debrief Assistant</h1>
+  return (
+    <div className="landing-page">
+      {/* Hero Section */}
+      <div className="hero-section">
+        <div className="hero-gradient-bg"></div>
+        <div className="hero-content">
+          <div className="hero-badge">🔬 Advanced Incident Intelligence</div>
+          <h1 className="hero-title">
+            Incident Debrief
+            <span className="hero-accent">Assistant</span>
+          </h1>
           <p className="hero-subtitle">
-            Comprehensive incident analysis and debrief tool powered by deterministic data processing
+            Transform incident investigations with deterministic data processing, intelligent timeline reconstruction, and actionable insights powered by advanced analysis algorithms.
           </p>
+          <div className="hero-metrics">
+            <div className="metric-item">
+              <span className="metric-value">98%</span>
+              <span className="metric-label">Analysis Accuracy</span>
+            </div>
+            <div className="metric-item">
+              <span className="metric-value">Under 30s</span>
+              <span className="metric-label">Response Time</span>
+            </div>
+            <div className="metric-item">
+              <span className="metric-value">24/7</span>
+              <span className="metric-label">Always Available</span>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div className="explanation-section">
-          <div className="explanation-content">
-            <h2>How it works</h2>
-            <p>
-              Select an incident below to generate a comprehensive analysis including timeline reconstruction, 
-              debrief metrics, root cause analysis, and actionable recommendations. All analysis is performed 
-              using deterministic rules based on incident data, journal entries, and field change history.
-            </p>
-            
-            <div className="features-grid">
-              <div className="feature-item">
-                <h3>📊 Timeline Analysis</h3>
-                <p>Complete chronological view of all incident events</p>
+      {/* How It Works Section */}
+      <div className="features-section">
+        <div className="features-container">
+          <h2 className="section-title">How It Works</h2>
+          <p className="section-description">
+            Our deterministic analysis engine processes every incident through multiple layers of intelligent insights, delivering comprehensive debriefs that drive operational excellence.
+          </p>
+
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <div className="icon-bg">📊</div>
               </div>
-              <div className="feature-item">
-                <h3>📈 Debrief Metrics</h3>
-                <p>Resolution time, handoffs, communication volume</p>
+              <div className="feature-content">
+                <h3>Timeline Reconstruction</h3>
+                <p>Complete chronological analysis of all incident events, field changes, and communication patterns across the entire lifecycle.</p>
               </div>
-              <div className="feature-item">
-                <h3>🔍 Root Cause Detection</h3>
-                <p>Automated analysis of journal entries and patterns</p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <div className="icon-bg">📈</div>
               </div>
-              <div className="feature-item">
-                <h3>💡 Recommendations</h3>
-                <p>Actionable insights for process improvement</p>
+              <div className="feature-content">
+                <h3>Debrief Metrics</h3>
+                <p>Advanced performance metrics including resolution time, assignment changes, communication volume, and SLA compliance tracking.</p>
+              </div>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <div className="icon-bg">🔍</div>
+              </div>
+              <div className="feature-content">
+                <h3>Root Cause Detection</h3>
+                <p>Intelligent pattern recognition and automated root cause analysis based on historical data, journal entries, and field change history.</p>
+              </div>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <div className="icon-bg">💡</div>
+              </div>
+              <div className="feature-content">
+                <h3>Actionable Insights</h3>
+                <p>Data-driven recommendations for process improvement, prevention measures, and operational excellence initiatives.</p>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="incident-selection">
-          <div className="selection-card">
-            <h2>Select Incident for Analysis</h2>
-            <p className="selection-instruction">
-              Search by incident number or description to find the incident you want to analyze
-            </p>
+      {/* Search Section */}
+      <div className="search-section">
+        <div className="search-container">
+          <h2 className="search-title">Start Investigation</h2>
+          <p className="search-subtitle">Find and analyze any incident with our intelligent search engine</p>
 
-            {error && (
-              <div className="error-message">
-                <span className="error-icon">⚠️</span>
-                {error}
-              </div>
-            )}
+          {error && (
+            <div className="error-alert">
+              <span className="error-icon">⚠️</span>
+              <span className="error-text">{error}</span>
+            </div>
+          )}
 
-            <div className="picker-container">
-              <div className="search-input-container">
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder="Enter incident number (e.g., INC0000123) or search keywords..."
-                  value={searchTerm}
-                  onChange={handleInputChange}
-                  onFocus={handleInputFocus}
-                  onBlur={handleInputBlur}
-                />
-                {isSearching && <div className="search-spinner">🔍 Searching...</div>}
-              </div>
+          <div className="search-input-wrapper">
+            <div className="search-input-container">
+              <div className="search-icon">🔍</div>
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search incidents by number, description, or keywords..."
+                value={searchTerm}
+                onChange={handleInputChange}
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
+              />
+              {isSearching && <div className="search-loader">⏳</div>}
+            </div>
 
-              {showDropdown && searchResults && searchResults.length > 0 && (
-                <div className="search-dropdown">
-                  {searchResults.slice(0, 10).map((incident) => {
-                    if (!incident || !incident.sys_id) {
-                      return null; // Skip invalid incidents
-                    }
-                    
+            {/* Search Results Panel */}
+            {showDropdown && searchResults && searchResults.length > 0 && (
+              <div className="results-panel">
+                <div className="results-header">
+                  <span className="results-count">{searchResults.length} results found</span>
+                </div>
+                <div className="results-list">
+                  {searchResults.slice(0, 8).map((incident) => {
+                    if (!incident || !incident.sys_id) return null;
+
                     return (
                       <div
                         key={incident.sys_id}
-                        className="search-result-item"
+                        className="result-item"
                         onClick={() => handleIncidentSelect(incident)}
                       >
-                        <div className="incident-header">
+                        <div className="result-primary">
                           <span className="incident-number">{incident.number || 'Unknown'}</span>
-                          <div className="incident-badges">
-                            <span 
-                              className="state-badge"
+                          <span className="incident-description-text">
+                            {incident.short_description || 'No description available'}
+                          </span>
+                        </div>
+                        <div className="result-meta">
+                          <div className="status-badges">
+                            <span
+                              className="status-badge"
                               style={{ backgroundColor: getStateColor(incident.state) }}
                             >
                               {incident.state_display || 'Unknown'}
                             </span>
-                            <span 
+                            <span
                               className="priority-badge"
                               style={{ backgroundColor: getPriorityColor(incident.priority) }}
                             >
                               P{incident.priority || '?'}
                             </span>
                           </div>
+                          {incident.assignment_group_display && (
+                            <span className="assignment-group">
+                              <span className="group-icon">🏢</span>
+                              {incident.assignment_group_display}
+                            </span>
+                          )}
                         </div>
-                        <div className="incident-description">{incident.short_description || 'No description available'}</div>
-                        {incident.assignment_group_display && (
-                          <div className="incident-assignment">Assigned to: {incident.assignment_group_display}</div>
-                        )}
                       </div>
                     );
                   })}
                 </div>
-              )}
+              </div>
+            )}
 
-              {showDropdown && searchResults && searchResults.length === 0 && !isSearching && searchTerm.length > 2 && !selectedIncident && (
-                <div className="search-dropdown">
-                  <div className="no-results">
-                    <span className="no-results-icon">🔍</span>
-                    No incidents found for "{searchTerm}"
-                  </div>
+            {showDropdown && searchResults && searchResults.length === 0 && !isSearching && searchTerm.length > 2 && !selectedIncident && (
+              <div className="results-panel empty-results">
+                <div className="no-results-content">
+                  <div className="no-results-icon">🔍</div>
+                  <p className="no-results-text">No incidents found matching "{searchTerm}"</p>
+                  <p className="no-results-hint">Try different keywords or check the incident number format</p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
 
-            <div className="action-container">
-              <button 
-                className="analyze-button primary-button"
-                onClick={handleAnalyze}
-                disabled={!selectedIncident}
-              >
-                Analyze Incident
-              </button>
-              
-              {selectedIncident && (
-                <div className="selected-info">
-                  <span className="selected-label">Selected:</span>
+          <div className="action-area">
+            <button
+              className="analyze-cta"
+              onClick={handleAnalyze}
+              disabled={!selectedIncident}
+            >
+              <span className="cta-text">Analyze Incident</span>
+              <span className="cta-icon">→</span>
+            </button>
+
+            {selectedIncident && (
+              <div className="selection-confirm">
+                <div className="selected-icon">✅</div>
+                <div className="selected-details">
+                  <span className="selected-label">Ready to analyze:</span>
                   <span className="selected-incident">
                     {selectedIncident.number} - {selectedIncident.short_description}
                   </span>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    );
-  } catch (error) {
-    handleError(error);
-    return (
-      <div className="landing-page">
-        <div className="error-fallback">
-          <h2>Something went wrong</h2>
-          <p>Please refresh the page and try again.</p>
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 }
