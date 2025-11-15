@@ -286,7 +286,7 @@ export default function CIHealthHistoryCard({ incident, onLoad }) {
       <div className="card-content">
         <div className="ci-health-grid">
           {/* CI Configuration Details */}
-          <div className="action-section">
+          {/* <div className="action-section">
             <h4 className="section-title">
               💻 Configuration Item: <span className="section-value">{healthData.ci_info.name || 'Unknown Configuration Item'}</span>
             </h4>
@@ -295,7 +295,7 @@ export default function CIHealthHistoryCard({ incident, onLoad }) {
             <h4 className="section-title">
               ⏰ Analysis Window: <span className="section-value">{healthData.health_analysis.time_window.pre_incident_hours} hours pre-incident</span>
             </h4>
-          </div>
+          </div> */}
 
           {/* Key Health Metrics */}
           <div className="metrics-grid">
