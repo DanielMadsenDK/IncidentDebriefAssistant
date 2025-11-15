@@ -199,6 +199,38 @@ export default function AnalysisPage({ incidentSysId, onNavigateToLanding }) {
                     subtitle={incident.problem_link.state === 'Closed' ? 'Resolved problem' : 'Active problem'}
                   />
                 )}
+                {incident?.ci_impact_network && incident.ci_impact_network.primary_ci && (
+                  <MetricItem
+                    icon="🔬"
+                    label="CI Network Analysis"
+                    value={`Impact: ${incident.ci_impact_network.impact_score || 0}/10`}
+                    subtitle={`${incident.ci_impact_network.dependencies?.length || 0} dependencies, ${(incident.ci_impact_network.impacted_services || []).length} services`}
+                  />
+                )}
+                {incident?.change_interventions && incident.change_interventions.related_changes?.length > 0 && (
+                  <MetricItem
+                    icon="🔧"
+                    label="Change Interventions"
+                    value={incident.change_interventions.changes_implemented || 0}
+                    subtitle={`${incident.change_interventions.related_changes.length} changes linked`}
+                  />
+                )}
+                {incident?.assignee_workload && (
+                  <MetricItem
+                    icon="⚖️"
+                    label="Assignment Workload"
+                    value={`${incident.assignee_workload.overall_score || 0}/100`}
+                    subtitle={`${incident.assignee_workload.assignee_history?.length || 0} assignment events`}
+                  />
+                )}
+                {incident?.categorization_quality && (
+                  <MetricItem
+                    icon="🏷️"
+                    label="Category Confidence"
+                    value={`${incident.categorization_quality.confidence_score || 0}%`}
+                    subtitle={`${(incident.categorization_quality.suggestions || []).length} improvement suggestions`}
+                  />
+                )}
                 {incident?.ci_details && (
                   <MetricItem
                     icon="💻"

@@ -107,14 +107,35 @@ export default class IncidentAnalysisService {
 
     assessment += `Generated ${debrief.note_count.total} notes (${debrief.note_count.comments} comments, ${debrief.note_count.work_notes} work notes). `;
 
-    // Add new metrics to impact assessment
+    // Add Phase 1 & 2 advanced metrics to impact assessment
+    if (incident.ci_impact_network && incident.ci_impact_network.impact_score) {
+      assessment += `Configuration Item impact score: ${incident.ci_impact_network.impact_score}/10`;
+      if (incident.ci_impact_network.impacted_services && incident.ci_impact_network.impacted_services.length > 0) {
+        assessment += ` - affecting ${incident.ci_impact_network.impacted_services.length} business services. `;
+      } else {
+        assessment += '. ';
+      }
+    }
+
+    if (incident.change_interventions && incident.change_interventions.changes_implemented > 0) {
+      assessment += `Involves ${incident.change_interventions.changes_implemented} implemented changes. `;
+    }
+
+    if (incident.assignee_workload && incident.assignee_workload.overall_score) {
+      assessment += `Assignment workload score: ${incident.assignee_workload.overall_score}/100. `;
+    }
+
+    if (incident.categorization_quality && incident.categorization_quality.confidence_score) {
+      assessment += `Category confidence: ${incident.categorization_quality.confidence_score}%. `;
+    }
+
+    // Add existing metrics
     if (incident.hierarchy && incident.hierarchy.complexity) {
-      assessment += `Hierarchy complexity score: ${incident.hierarchy.complexity.score}/10. `;
+      assessment += `Hierarchy complexity: ${incident.hierarchy.complexity.score}/10. `;
     }
 
     if (incident.sla_compliance && incident.sla_compliance.score !== undefined) {
-      const slaScore = incident.sla_compliance.score;
-      assessment += `SLA compliance: ${slaScore}%. `;
+      assessment += `SLA compliance: ${incident.sla_compliance.score}%. `;
     }
 
     if (incident.resolution_quality) {

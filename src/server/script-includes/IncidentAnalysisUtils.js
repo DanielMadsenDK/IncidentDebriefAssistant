@@ -146,6 +146,10 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
       hierarchy: this.getIncidentHierarchy(sys_id),
       problem_link: this.getProblemLink(sys_id),
       sla_compliance: this.getSLACompliance(sys_id),
+      ci_impact_network: this.getCIImpactNetwork(sys_id, 2),
+      change_interventions: this.getChangeInterventions(sys_id),
+      assignee_workload: this.calculateAssigneeWorkload(sys_id),
+      categorization_quality: this.assessCategorizationQuality(sys_id),
       ci_details: this.getCIDetails(sys_id)
     };
   },
@@ -305,6 +309,271 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
       });
     }
     return slas;
+  },
+
+  getCIImpactNetwork: function(sys_id, maxDepth) {
+    var incident = new GlideRecord('incident');
+    if (!incident.get(sys_id) || !incident.cmdb_ci) return { primary_ci: {}, dependencies: [], impact_score: 0 };
+
+    var network = {
+      primary_ci: {},
+      dependencies: [],
+      impacted_services: [],
+      impact_score: 5, // Default medium impact
+      depth_analyzed: 0
+    };
+
+    // Get primary CI details
+    var ci = new GlideRecord('cmdb_ci');
+    if (ci.get(incident.cmdb_ci.sys_id)) {
+      network.primary_ci = {
+        sys_id: ci.sys_id,
+        name: ci.getDisplayValue('name'),
+        class: ci.getDisplayValue('sys_class_name'),
+        install_status: ci.getDisplayValue('install_status'),
+        operational_status: ci.getDisplayValue('operational_status'),
+        impact: ci.getValue('u_impact') || 5
+      };
+      network.impact_score = network.primary_ci.impact;
+    }
+
+    // Analyze CI relationships - limit depth to prevent performance issues
+    var maxDepth = maxDepth || 2;
+    this._analyzeCIDependencies(ci.sys_id, maxDepth, network, 1);
+
+    return network;
+  },
+
+  _analyzeCIDependencies: function(ciSysId, maxDepth, network, currentDepth) {
+    if (currentDepth > maxDepth) return;
+
+    var cdta = new CIData();
+    try {
+      cdta.loadFromCI(ciSysId);
+      network.depth_analyzed = Math.max(network.depth_analyzed, currentDepth);
+    } catch (e) {
+      gs.warn('CIData load failed for CI: ' + ciSysId);
+      return;
+    }
+
+    // Analyze cmdb_rel_ci relationships
+    var relationships = cdta.getRelatedListInstance('cmdb_rel_ci', 'parent');
+    if (relationships) {
+      var relatedCIs = cdta.getM2MTable('cmdb_ci', null);
+      for (var i = 0; i < relatedCIs.length && i < 10; i++) { // Limit to prevent performance issues
+        var relatedCI = relatedCIs[i];
+
+        // Only add if not already in dependencies
+        var exists = false;
+        for (var j = 0; j < network.dependencies.length; j++) {
+          if (network.dependencies[j].sys_id === relatedCI.sys_id) {
+            exists = true;
+            break;
+          }
+        }
+
+        if (!exists) {
+          network.dependencies.push({
+            sys_id: relatedCI.sys_id,
+            name: relatedCI.name || 'Unknown CI',
+            class: relatedCI.sys_class_name || 'Unknown',
+            relationship: 'Depends on',
+            depth: currentDepth
+          });
+
+          // Adjust impact score based on relationship criticality
+          if (relatedCI.sys_class_name == 'cmdb_ci_service') {
+            network.impacted_services.push(relatedCI.name);
+            network.impact_score = Math.max(network.impact_score, 8); // High impact for service dependency
+          } else if (currentDepth === 1) {
+            network.impact_score = Math.max(network.impact_score, 6); // Medium-high impact for direct dependencies
+          }
+        }
+      }
+    }
+  },
+
+  getChangeInterventions: function(sys_id) {
+    var interventions = {
+      related_changes: [],
+      changes_implemented: 0,
+      post_implementation_incidents: 0,
+      effectiveness_rating: 'unknown'
+    };
+
+    // Find changes related to this incident via task_rel_task
+    var taskRelations = new GlideRecord('task_rel_task');
+    taskRelations.addQuery('child', sys_id);
+    taskRelations.addQuery('type', 'Fixes::Fixed by'); // Confirmed relationship type
+    taskRelations.query();
+
+    while (taskRelations.next()) {
+      var changeGR = new GlideRecord('change_request');
+      if (changeGR.get(taskRelations.parent.toString())) {
+        var changeInfo = {
+          sys_id: changeGR.sys_id,
+          number: changeGR.getDisplayValue('number'),
+          short_description: changeGR.getDisplayValue('short_description'),
+          state: changeGR.getDisplayValue('state'),
+          type: changeGR.getDisplayValue('type'),
+          planned_start_date: changeGR.getDisplayValue('start_date'),
+          planned_end_date: changeGR.getDisplayValue('end_date'),
+          actual_end_date: changeGR.getDisplayValue('work_end'),
+          risk: changeGR.getDisplayValue('risk')
+        };
+
+        interventions.related_changes.push(changeInfo);
+
+        // Track implementation completion
+        if (changeInfo.state === 'Closed' || changeInfo.state === 'Implemented') {
+          interventions.changes_implemented++;
+        }
+      }
+    }
+
+    // Assess change effectiveness
+    if (interventions.changes_implemented > 0) {
+      interventions.effectiveness_rating = 'implemented_changes';
+    } else if (interventions.related_changes.length > 0) {
+      interventions.effectiveness_rating = 'pending_changes';
+    }
+
+    return interventions;
+  },
+
+  calculateAssigneeWorkload: function(sys_id) {
+    var incident = new GlideRecord('incident');
+    if (!incident.get(sys_id)) return { assignee_stats: {}, group_workload: {}, performance_score: 0 };
+
+    var workload = {
+      assignee_history: [],
+      group_comparison: {},
+      performance_indicators: {},
+      overall_score: 50
+    };
+
+    // Get incident assignee history from timeline data
+    // This would analyze the current incident's assignment patterns
+    var timeline = this._buildTimeline(sys_id);
+
+    var currentAssignee = incident.assigned_to;
+    var currentGroup = incident.assignment_group;
+
+    if (currentAssignee) {
+      workload.assignee_history.push({
+        sys_id: currentAssignee.toString(),
+        name: incident.assigned_to.getDisplayValue(),
+        assignment_date: incident.sys_updated_on.getDisplayValue(),
+        role: 'Current Owner'
+      });
+    }
+
+    // Look for assignment changes in timeline
+    for (var i = 0; i < timeline.length; i++) {
+      var event = timeline[i];
+      if (event.type === 'field_change' &&
+          (event.field === 'assigned_to' || event.field === 'assignment_group')) {
+        workload.assignee_history.push({
+          field: event.field,
+          old_value: event.old_value,
+          new_value: event.new_value,
+          timestamp: event.timestamp,
+          type: 'Assignment Change'
+        });
+      }
+    }
+
+    // Basic workload assessment based on available data
+    workload.performance_indicators = {
+      reassignment_count: workload.assignee_history.filter(function(item) {
+        return item.type === 'Assignment Change';
+      }).length,
+      stability: workload.assignee_history.length <= 2 ? 'high' : 'low',
+      resolution: incident.state === 'Resolved' || incident.state === 'Closed'
+    };
+
+    workload.overall_score = workload.performance_indicators.reassignment_count > 2 ? 30 :
+                           workload.performance_indicators.reassignment_count > 0 ? 60 : 85;
+
+    return workload;
+  },
+
+  assessCategorizationQuality: function(sys_id) {
+    var incident = new GlideRecord('incident');
+    if (!incident.get(sys_id)) return { confidence_score: 0, categories: {}, suggestions: [] };
+
+    var assessment = {
+      confidence_score: 75, // Start with high confidence
+      categories: {
+        category: incident.getDisplayValue('category') || 'Not categorized',
+        subcategory: incident.getDisplayValue('subcategory') || 'Not categorized',
+        ci_attached: !!incident.cmdb_ci
+      },
+      risk_factors: [],
+      suggestions: []
+    };
+
+    // Assess categorization quality based on resolution details
+    var closeNotes = this._getCloseNotesDetails(sys_id);
+    var resolutionApproach = closeNotes.notes.toLowerCase();
+
+    // Check if resolution matches category expectations
+    if (incident.category) {
+      var category = incident.category.toLowerCase();
+      var resolutionMismatch = false;
+
+      if (category.indexOf('hardware') !== -1 && resolutionApproach.indexOf('software') > resolutionApproach.indexOf('hardware')) {
+        resolutionMismatch = true;
+        assessment.suggestions.push('Category suggests hardware issue but resolution appears software-related');
+      } else if (category.indexOf('software') !== -1 && resolutionApproach.indexOf('hardware') > resolutionApproach.indexOf('software')) {
+        resolutionMismatch = true;
+        assessment.suggestions.push('Category suggests software issue but resolution appears hardware-related');
+      }
+
+      if (resolutionMismatch) {
+        assessment.confidence_score -= 25;
+        assessment.risk_factors.push('Category-resolution mismatch');
+      }
+    }
+
+    // Check CI attachment for technical categories
+    if (!assessment.categories.ci_attached &&
+        (resolutionApproach.indexOf('server') !== -1 ||
+         resolutionApproach.indexOf('database') !== -1 ||
+         resolutionApproach.indexOf('network') !== -1)) {
+      assessment.confidence_score -= 15;
+      assessment.suggestions.push('Technical resolution documented but no CI attached');
+      assessment.risk_factors.push('Missing CI for technical issue');
+    }
+
+    // Assess completeness
+    if (!assessment.categories.category || assessment.categories.category === 'Not categorized') {
+      assessment.confidence_score -= 20;
+      assessment.suggestions.push('Incident not properly categorized - missing category');
+      assessment.risk_factors.push('Uncategorized incident');
+    }
+
+    if (!assessment.categories.subcategory || assessment.categories.subcategory === 'Not categorized') {
+      assessment.confidence_score -= 10;
+      assessment.suggestions.push('Missing subcategory for better classification');
+    }
+
+    return assessment;
+  },
+
+  _getCloseNotesDetails: function(sys_id) {
+    var details = { notes: '', attachments: 0 };
+
+    // Get close notes
+    var incident = new GlideRecord('incident');
+    if (incident.get(sys_id)) {
+      details.notes = incident.getDisplayValue('close_notes') || '';
+
+      // Could count attachments if needed
+      // details.attachments = countAttachments(sys_id);
+    }
+
+    return details;
   },
 
   getCIDetails: function(sys_id) {
