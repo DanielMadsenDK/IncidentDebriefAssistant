@@ -285,15 +285,15 @@ export default function CIHealthHistoryCard({ incident, onLoad }) {
       </div>
       <div className="card-content">
         <div className="ci-health-grid">
-          {/* CI Configuration Details */}
-          <div className="overview-grid">
-            <div className="overview-item">
-              <span className="overview-label">Configuration Item</span>
-              <p className="overview-value">{healthData.ci_info.name || 'Unknown Configuration Item'}</p>
+          {/* CI Configuration Details - Compact 2-column layout */}
+          <div className="ci-config-header">
+            <div className="config-column">
+              <div className="config-label">Configuration Item</div>
+              <div className="config-value ci-name">{healthData.ci_info.name || 'Unknown Configuration Item'}</div>
             </div>
-            <div className="overview-item">
-              <span className="overview-label">Analysis Window</span>
-              <p className="overview-value">{healthData.health_analysis.time_window.pre_incident_hours} hours pre-incident</p>
+            <div className="config-column">
+              <div className="config-label">Analysis Window</div>
+              <div className="config-value analysis-window">{healthData.health_analysis.time_window.pre_incident_hours} hours pre-incident</div>
             </div>
           </div>
 

@@ -1215,6 +1215,90 @@
   gap: 2rem;
 }
 
+/* Compact CI Configuration Header */
+.ci-config-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, rgba(0, 115, 230, 0.08) 0%, rgba(40, 167, 69, 0.08) 100%);
+  border-radius: 14px;
+  border: 1px solid rgba(0, 115, 230, 0.15);
+  box-shadow:
+    0 2px 8px rgba(0, 115, 230, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.config-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.config-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.config-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a202c;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.875rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.config-value::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(135deg, #0073e6 0%, #28a745 100%);
+}
+
+/* Specific styling for CI name and analysis window */
+.ci-name {
+  color: #1a202c;
+  background: linear-gradient(135deg, rgba(0, 115, 230, 0.12) 0%, rgba(255, 255, 255, 0.95) 100%);
+}
+
+.analysis-window {
+  color: #1a202c;
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.12) 0%, rgba(255, 255, 255, 0.95) 100%);
+}
+
+/* Responsive adjustments for config header */
+@media (max-width: 768px) {
+  .ci-config-header {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .config-column {
+    text-align: left;
+  }
+
+  .config-value {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+}
+
 /* CI Health Score Badge */
 .ci-health-score-badge {
   background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
