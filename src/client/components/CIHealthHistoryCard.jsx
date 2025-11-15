@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import './AnalysisPage.css';
 
+// Metric Item Component (used locally in this component)
+function MetricItem({ icon, label, value, subtitle, status }) {
+  return (
+    <div className="metric-item">
+      <div className="metric-header">
+        <span className="metric-icon">{icon}</span>
+        <span className="metric-label">{label}</span>
+      </div>
+      <div className="metric-value">{value}</div>
+      {subtitle && <div className="metric-subtitle">{subtitle}</div>}
+      {status && <div className={`metric-status ${status}`}>{status}</div>}
+    </div>
+  );
+}
+
 // Health Score Gauge Component
 function HealthScoreGauge({ score }) {
   const radius = 36;
