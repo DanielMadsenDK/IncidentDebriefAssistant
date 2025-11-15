@@ -967,6 +967,31 @@
   color: #4a5568;
 }
 
+/* Highlight config values to make them stand out */
+.config-value.highlight {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a202c;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  border: 2px solid rgba(0, 115, 230, 0.15);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.ci-name.highlight {
+  color: #0073e6;
+  font-weight: 900;
+}
+
+.analysis-window.highlight {
+  color: #28a745;
+  font-weight: 900;
+}
+
 .no-data {
   background: #f8fafc !important;
   padding: 1rem 1.25rem;
