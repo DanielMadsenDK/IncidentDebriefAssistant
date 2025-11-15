@@ -135,6 +135,7 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
       caller_id: gr.getDisplayValue('caller_id'),
       business_service: gr.getDisplayValue('business_service'),
       cmdb_ci: gr.getDisplayValue('cmdb_ci'),
+      cmdb_ci_sys_id: this._resolveCISysId(gr.getValue('cmdb_ci')),
       impact: gr.getDisplayValue('impact'),
       urgency: gr.getDisplayValue('urgency'),
       sys_created_on: gr.getDisplayValue('sys_created_on'),
@@ -522,11 +523,25 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
     try {
       // Get incident and validate CI association
       var incident = new GlideRecord('incident');
-      if (!incident.get(sys_id) || !incident.cmdb_ci || incident.cmdb_ci === '' || incident.cmdb_ci === null) {
+      if (!incident.get(sys_id)) {
       return JSON.stringify({
         success: false,
-        error: 'Incident not found or no CI associated',
-        data: { ci_present: false, summary: { insights: 'No CI attached to incident - health analysis not available' }}
+        error: 'Unable to load incident analysis',
+        data: { ci_present: false, summary: { insights: 'This incident could not be found or loaded' }}
+      });
+      }
+
+      if (!incident.cmdb_ci || incident.cmdb_ci === '' || incident.cmdb_ci === null) {
+      return JSON.stringify({
+        success: false,
+        error: 'Configuration Item not connected',
+        data: {
+          ci_present: false,
+          summary: {
+            insights: 'No Configuration Item is currently assigned to this incident. CI health analysis is not available without a connected configuration item.',
+            friendly_message: '🔗 Add a Configuration Item to this incident to view its health history and correlation analysis.'
+          }
+        }
       });
       }
 
@@ -540,8 +555,8 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
         analysis_timestamp: new GlideDateTime().getValue()
       };
 
-      // Get CI information
-      healthHistory.ci_info = this._getCIHealthData(incident.cmdb_ci.toString());
+      // Get CI information using resolved sys_id from incident record
+      healthHistory.ci_info = this._getCIHealthData(incident.cmdb_ci_sys_id);
 
       // Analyze health history during relevant timeframes
       healthHistory.health_analysis = this._analyzeCIHealthHistory(
@@ -551,7 +566,7 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
 
       // Get related activity (incidents, changes, SLA events)
       healthHistory.related_activity = this._getCIActivityDuringPeriod(
-        incident.cmdb_ci.toString(),
+        incident.cmdb_ci_sys_id,
         healthHistory.health_analysis.time_window.start_time,
         healthHistory.health_analysis.time_window.incident_opened_at
       );
@@ -576,9 +591,13 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
   },
 
   _getCIHealthData: function(ciSysId) {
+    if (!ciSysId) {
+      return { error: 'No CI sys_id provided' };
+    }
+
     var ciGR = new GlideRecord('cmdb_ci');
     if (!ciGR.get(ciSysId)) {
-      return { error: 'CI record not accessible or does not exist' };
+      return { error: 'CI record not accessible or does not exist - sys_id: ' + ciSysId };
     }
 
     return {
@@ -858,6 +877,33 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
     }
 
     return details;
+  },
+
+  _resolveCISysId: function(cmdbCIValue) {
+    if (!cmdbCIValue || cmdbCIValue === '' || cmdbCIValue === null) {
+      return null;
+    }
+
+    // First, try to interpret as a sys_id (standard ServiceNow format)
+    if (cmdbCIValue.toString().length === 32 && /^[a-f0-9]{32}$/.test(cmdbCIValue.toString())) {
+      // Looks like a valid sys_id format - verify it exists
+      var testCI = new GlideRecord('cmdb_ci');
+      if (testCI.get(cmdbCIValue.toString())) {
+        return cmdbCIValue.toString();
+      }
+    }
+
+    // If it's not a sys_id, try to look it up by name (handles demo data and display names)
+    var lookupCI = new GlideRecord('cmdb_ci');
+    lookupCI.addQuery('name', cmdbCIValue);
+    lookupCI.query();
+    if (lookupCI.next()) {
+      return lookupCI.sys_id.toString();
+    }
+
+    // Last resort - nothing found
+    gs.warn('CI resolution failed: no CI found for value: ' + cmdbCIValue);
+    return null;
   },
 
   getCIDetails: function(sys_id) {
