@@ -299,22 +299,28 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
   },
 
   getSLACompliance: function(sys_id) {
-    var slaGR = new GlideRecord('task_sla');
-    slaGR.addQuery('task', sys_id);
-    slaGR.addQuery('record', 'incident');
-    slaGR.query();
+    // In ServiceNow, SLAs are attached to tasks and have their own records
+    // We need to query for SLAs where the task sys_id matches our incident
+    try {
+      var slaGR = new GlideRecord('task_sla');
+      slaGR.addQuery('task', sys_id);
+      slaGR.query();
 
-    var slas = [];
-    while (slaGR.next()) {
-      slas.push({
-        sys_id: slaGR.sys_id,
-        sla_name: slaGR.sla.getDisplayValue(),
-        stage: slaGR.stage.getDisplayValue(),
-        breach_time: slaGR.breach_time ? slaGR.breach_time.getDisplayValue() : null,
-        planned_goal_time: slaGR.planned_goal_time ? slaGR.planned_goal_time.getDisplayValue() : null
-      });
+      var slas = [];
+      while (slaGR.next()) {
+        slas.push({
+          sys_id: slaGR.sys_id,
+          sla_name: slaGR.sla ? slaGR.sla.getDisplayValue() : 'Unknown SLA',
+          stage: slaGR.stage ? slaGR.stage.getDisplayValue() : 'Unknown',
+          breach_time: slaGR.breach_time ? slaGR.breach_time.getDisplayValue() : null,
+          planned_goal_time: slaGR.planned_goal_time ? slaGR.planned_goal_time.getDisplayValue() : null
+        });
+      }
+      return slas;
+    } catch (e) {
+      gs.warn('SLA compliance query failed: ' + e.toString());
+      return [];
     }
-    return slas;
   },
 
   getCIImpactNetwork: function(sys_id, maxDepth) {
@@ -555,8 +561,9 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
         analysis_timestamp: new GlideDateTime().getValue()
       };
 
-      // Get CI information using resolved sys_id from incident record
-      healthHistory.ci_info = this._getCIHealthData(incident.cmdb_ci_sys_id);
+      // Resolve CI sys_id within the method for reliability
+      var ciSysId = this._resolveCISysId(incident.getValue('cmdb_ci'));
+      healthHistory.ci_info = this._getCIHealthData(ciSysId);
 
       // Analyze health history during relevant timeframes
       healthHistory.health_analysis = this._analyzeCIHealthHistory(
@@ -566,7 +573,7 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
 
       // Get related activity (incidents, changes, SLA events)
       healthHistory.related_activity = this._getCIActivityDuringPeriod(
-        incident.cmdb_ci_sys_id,
+        ciSysId,
         healthHistory.health_analysis.time_window.start_time,
         healthHistory.health_analysis.time_window.incident_opened_at
       );
@@ -1258,5 +1265,158 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
     return compliance;
   },
 
+  // Background Script Test Utility for CI Health History
+  // Copy below code and paste into Background Scripts in ServiceNow to test
+  testCIHealthHistoryBackgroundScript: function() {
+    /*
+     * USAGE INSTRUCTIONS:
+     *
+     * 1. Open ServiceNow Studio or Background Scripts
+     * 2. Copy and paste this script
+     * 3. Set the variables below and execute
+     */
+  },
+
   type: 'IncidentAnalysisUtils'
 });
+
+/*
+BACKGROUND SCRIPT FOR TESTING CI HEALTH HISTORY METHOD
+
+Copy everything between the MARKERS below and paste into ServiceNow Background Scripts:
+
+// MARKER - COPY FROM HERE
+(function() {
+    // TEST PARAMETERS - Configure these
+    var incidentSysId = 'YOUR_INCIDENT_SYS_ID_HERE'; // Get from incident form URL
+    var hours = 48; // Analysis window in hours (default: 48)
+
+    // Initialize the script include
+    var utils = new IncidentAnalysisUtils();
+
+    try {
+        gs.info('=== CI HEALTH HISTORY TEST STARTED ===');
+        gs.info('Testing incident: ' + incidentSysId);
+
+        // Get incident details first for validation
+        var incident = utils._getIncidentRecord(incidentSysId);
+        if (!incident) {
+            gs.error('❌ INCIDENT NOT FOUND: ' + incidentSysId);
+            return;
+        }
+
+        gs.info('✅ Incident found: ' + incident.number + ' - ' + incident.short_description);
+        gs.info('✅ CI attached: ' + incident.cmdb_ci + ' (resolved sys_id: ' + incident.cmdb_ci_sys_id + ')');
+
+        // Call the CI Health History method
+        gs.info('📊 Calling getCIHealthHistoryDuringIncident with ' + hours + ' hour window...');
+
+        var startTime = new GlideDateTime().getNumericValue();
+        var result = utils.getCIHealthHistoryDuringIncident(incidentSysId, hours);
+        var endTime = new GlideDateTime().getNumericValue();
+
+        gs.info('⚡ Method execution time: ' + (endTime - startTime) + 'ms');
+
+        // Parse and display results
+        try {
+            var parsedResult = JSON.parse(result);
+            gs.info('📋 RESPONSE STATUS: ' + (parsedResult.success ? 'SUCCESS ✅' : 'FAILED ❌'));
+
+            if (parsedResult.success && parsedResult.data) {
+                var data = parsedResult.data;
+
+                // CI Info Summary
+                gs.info('🏷️  CI INFORMATION:');
+                if (data.ci_info && !data.ci_info.error) {
+                    gs.info('   - Name: ' + data.ci_info.name);
+                    gs.info('   - Class: ' + data.ci_info.class);
+                    gs.info('   - Operational Status: ' + data.ci_info.operational_status);
+                    gs.info('   - Install Status: ' + data.ci_info.install_status);
+                } else {
+                    gs.error('   ❌ CI could not be loaded: ' + JSON.stringify(data.ci_info));
+                }
+
+                // Time Window Info
+                gs.info('⏰ TIME ANALYSIS WINDOW:');
+                if (data.health_analysis && data.health_analysis.time_window) {
+                    var tw = data.health_analysis.time_window;
+                    gs.info('   - Analysis window: ' + tw.pre_incident_hours + ' hours');
+                    gs.info('   - Start time: ' + tw.start_time);
+                    gs.info('   - Incident time: ' + tw.incident_opened_at);
+                }
+
+                // Related Activity Summary
+                gs.info('📊 RELATED ACTIVITY SUMMARY:');
+                if (data.related_activity) {
+                    var ra = data.related_activity;
+                    gs.info('   - Pre-incident incidents: ' + ra.pre_incident_incidents.length);
+                    gs.info('   - Related changes: ' + ra.related_change_requests.length);
+                    gs.info('   - SLA events: ' + ra.sla_events.length);
+
+                    // Detailed incident listing
+                    if (ra.pre_incident_incidents.length > 0) {
+                        gs.info('📋 RELATED INCIDENTS DETAILS:');
+                        ra.pre_incident_incidents.forEach(function(inc, idx) {
+                            gs.info('   ' + (idx+1) + '. ' + inc.number + ' - ' + inc.short_description +
+                                   ' (Priority: ' + inc.priority + ', State: ' + inc.state + ', Opened: ' + inc.opened_at + ')');
+                        });
+                    }
+
+                    // Detailed change listing
+                    if (ra.related_change_requests.length > 0) {
+                        gs.info('🔧 RELATED CHANGES DETAILS:');
+                        ra.related_change_requests.forEach(function(ch, idx) {
+                            gs.info('   ' + (idx+1) + '. ' + ch.number + ' - ' + ch.short_description +
+                                   ' (Type: ' + ch.type + ', State: ' + ch.state + ')');
+                        });
+                    }
+
+                    // SLA events
+                    if (ra.sla_events.length > 0) {
+                        gs.info('⚠️  SLA EVENTS:');
+                        ra.sla_events.forEach(function(sla, idx) {
+                            gs.info('   ' + (idx+1) + '. ' + sla.sla_name + ' - ' + sla.stage +
+                                   ' (Breach: ' + (sla.breached ? 'YES' : 'NO') + ')');
+                        });
+                    }
+                }
+
+                // Stress Indicators
+                gs.info('🚦 STRESS INDICATORS:');
+                if (data.stress_indicators) {
+                    var si = data.stress_indicators;
+                    gs.info('   - Overload: ' + si.overload_indicator);
+                    gs.info('   - Stability risk: ' + si.stability_risk);
+                    gs.info('   - Health score: ' + si.health_score + '/100');
+                    gs.info('   - Correlation score: ' + data.correlation_score);
+
+                    if (si.correlation_insights && si.correlation_insights.length > 0) {
+                        gs.info('   🔍 INSIGHTS:');
+                        si.correlation_insights.forEach(function(insight, idx) {
+                            gs.info('      ' + (idx+1) + '. ' + insight);
+                        });
+                    }
+                }
+
+            } else {
+                gs.error('❌ METHOD FAILED');
+                gs.error('Error details: ' + parsedResult.error || 'Unknown error');
+            }
+
+        } catch (parseError) {
+            gs.error('❌ RESULT PARSING FAILED');
+            gs.error('Raw result: ' + result);
+            gs.error('Parse error: ' + parseError);
+        }
+
+        gs.info('=== CI HEALTH HISTORY TEST COMPLETED ===');
+
+    } catch (globalError) {
+        gs.error('💥 CRITICAL TEST FAILURE');
+        gs.error('Error: ' + globalError.toString());
+    }
+
+})();
+
+// MARKER - COPY UNTIL HERE
+*/
