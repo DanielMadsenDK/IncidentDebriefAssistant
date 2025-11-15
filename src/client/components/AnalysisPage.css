@@ -1220,44 +1220,50 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, rgba(0, 115, 230, 0.08) 0%, rgba(40, 167, 69, 0.08) 100%);
-  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(0, 115, 230, 0.05) 0%, rgba(255, 255, 255, 0.9) 100%);
+  border-radius: 16px;
   border: 1px solid rgba(0, 115, 230, 0.15);
   box-shadow:
-    0 2px 8px rgba(0, 115, 230, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 4px 16px rgba(0, 115, 230, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(8px);
 }
 
 .config-column {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  text-align: center;
+  position: relative;
 }
 
 .config-label {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .config-value {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
   color: #1a202c;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 0.875rem 1.25rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+  padding: 1rem 1.25rem;
   border-radius: 12px;
-  border: 1px solid rgba(226, 232, 240, 0.5);
-  backdrop-filter: blur(4px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  border: 2px solid transparent;
+  background-clip: padding-box;
   position: relative;
   overflow: hidden;
+  word-wrap: break-word;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
 }
 
 .config-value::before {
@@ -1266,19 +1272,34 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: linear-gradient(135deg, #0073e6 0%, #28a745 100%);
+  height: 4px;
+  background: linear-gradient(135deg,
+    #0073e6 0%,
+    #28a745 50%,
+    #0073e6 100%);
+  border-radius: 12px 12px 0 0;
+}
+
+.config-value:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 115, 230, 0.2);
 }
 
 /* Specific styling for CI name and analysis window */
 .ci-name {
-  color: #1a202c;
-  background: linear-gradient(135deg, rgba(0, 115, 230, 0.12) 0%, rgba(255, 255, 255, 0.95) 100%);
+  color: #0073e6;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(0, 115, 230, 0.2);
 }
 
 .analysis-window {
-  color: #1a202c;
-  background: linear-gradient(135deg, rgba(40, 167, 69, 0.12) 0%, rgba(255, 255, 255, 0.95) 100%);
+  color: #28a745;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(40, 167, 69, 0.2);
 }
 
 /* Responsive adjustments for config header */
