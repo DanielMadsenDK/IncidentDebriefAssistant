@@ -525,17 +525,32 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
     return workload;
   },
 
-  getCIHealthHistoryDuringIncident: function(sys_id, preIncidentWindowHours) {
+  getCIHealthHistoryDuringIncident: function() {
     try {
+      // Extract parameters from the GlideAjax call
+      var sys_id = this.getParameter('sysparm_sys_id');
+      var preIncidentWindowHours = this.getParameter('sysparm_pre_incident_window_hours') || 48;
+
+      gs.info('CI Health History: Received sys_id: ' + sys_id + ', window hours: ' + preIncidentWindowHours);
+
+      if (!sys_id) {
+        return JSON.stringify({
+          success: false,
+          error: 'Incident sys_id parameter is required'
+        });
+      }
+
       // Get incident and validate CI association
       var incident = new GlideRecord('incident');
       if (!incident.get(sys_id)) {
+      gs.info('CI Health History: Failed to load incident with sys_id: ' + sys_id);
       return JSON.stringify({
         success: false,
         error: 'Unable to load incident analysis',
         data: { ci_present: false, summary: { insights: 'This incident could not be found or loaded' }}
       });
       }
+      gs.info('CI Health History: Successfully loaded incident: ' + incident.getDisplayValue('number'));
 
       if (!incident.cmdb_ci || incident.cmdb_ci === '' || incident.cmdb_ci === null) {
       return JSON.stringify({
@@ -568,7 +583,7 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
       // Analyze health history during relevant timeframes
       healthHistory.health_analysis = this._analyzeCIHealthHistory(
         incident,
-        preIncidentWindowHours || 48
+        preIncidentWindowHours
       );
 
       // Get related activity (incidents, changes, SLA events)
