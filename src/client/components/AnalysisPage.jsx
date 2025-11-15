@@ -266,29 +266,40 @@ function TimelineEvent({ event, isLast }) {
   };
 
   return (
-    <div className="timeline-event">
-      <div className="timeline-marker" style={{ backgroundColor: getEventColor(event) }}>
-        <span className="timeline-icon">{getEventIcon(event)}</span>
+    <div className="timeline-item">
+      {!isLast && <div className="timeline-line"></div>}
+
+      <div className="timeline-node">
+        <div
+          className="timeline-dot"
+          style={{ backgroundColor: getEventColor(event) }}
+        >
+          <span className="timeline-icon">{getEventIcon(event)}</span>
+        </div>
       </div>
-      {!isLast && <div className="timeline-connector"></div>}
-      
+
       <div className="timeline-content">
         <div className="timeline-header">
-          <span className="timeline-time">
-            {new Date(event.timestamp).toLocaleDateString()} {new Date(event.timestamp).toLocaleTimeString()}
-          </span>
           <span className="timeline-user">{event.user}</span>
+          <span className="timeline-time">
+            {new Date(event.timestamp).toLocaleDateString()} {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
         </div>
-        
+
         <div className="timeline-body">
           {event.type === 'field_change' ? (
-            <span className="timeline-change">{event.change_description}</span>
+            <div className="timeline-change">
+              <span className="change-text">{event.change_description}</span>
+              <span className="event-type-badge">{event.type.replace('_', ' ')}</span>
+            </div>
           ) : (
             <div className="timeline-note">
-              <div className="note-type">{event.type === 'comment' ? 'Comment' : 'Work Note'}</div>
+              <div className="note-header">
+                <span className="note-type">{event.type === 'comment' ? '💭 Comment' : '📝 Work Note'}</span>
+              </div>
               <div className="note-content">
-                {event.content.length > 200 ? 
-                  event.content.substring(0, 200) + '...' : 
+                {event.content.length > 200 ?
+                  event.content.substring(0, 200) + '...' :
                   event.content
                 }
               </div>
