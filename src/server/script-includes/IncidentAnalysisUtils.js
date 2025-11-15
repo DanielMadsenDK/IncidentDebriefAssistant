@@ -523,11 +523,11 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
       // Get incident and validate CI association
       var incident = new GlideRecord('incident');
       if (!incident.get(sys_id) || !incident.cmdb_ci) {
-        return {
-          success: false,
-          error: 'Incident not found or no CI associated',
-          data: { ci_present: false, summary: { insights: 'No CI attached to incident - health analysis not available' }}
-        };
+      return JSON.stringify({
+        success: false,
+        error: 'Incident not found or no CI associated',
+        data: { ci_present: false, summary: { insights: 'No CI attached to incident - health analysis not available' }}
+      });
       }
 
       var healthHistory = {
@@ -559,19 +559,19 @@ IncidentAnalysisUtils.prototype = Object.extendsObject(global.AbstractAjaxProces
       // Calculate stress indicators and correlation
       healthHistory = this._calculateCIStressIndicators(healthHistory, incident);
 
-      return {
+      return JSON.stringify({
         success: true,
         data: healthHistory,
         message: 'CI health history analysis completed'
-      };
+      });
 
     } catch (e) {
       gs.error('CI Health History analysis failed: ' + e.toString());
-      return {
+      return JSON.stringify({
         success: false,
         error: 'CI health analysis failed: ' + e.toString(),
         data: null
-      };
+      });
     }
   },
 
